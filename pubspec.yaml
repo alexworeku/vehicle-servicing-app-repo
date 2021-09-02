@@ -28,6 +28,18 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   get: ^4.1.4
+  google_fonts: ^2.1.0
+  animations: ^2.0.0
+  flutter_slidable: ^0.6.0
+  flutter_spinkit: ^5.0.0
+  flutter_staggered_grid_view: ^0.4.0
+  flutter_swiper: ^1.1.6
+  image_picker: ^0.8.3+3
+  sqflite: ^2.0.0+4
+  firebase_core: ^1.6.0
+  cloud_firestore: ^2.5.1
+  firebase_storage: ^10.0.3
+  firebase_auth: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,11 +55,28 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
-  # An image asset can refer to one or more resolution-specific "variants", see
+  assets:
+    - assets/images/bk_image.jpg
+    - assets/images/accessory icon.png
+    - assets/images/article icon.png
+    - assets/images/bolo service icon.png
+    - assets/images/garage icon.png
+    - assets/images/tow truck icon.png
+    - assets/images/garage_bk.jpeg
+    - assets/images/bk 2.jpg
+    - assets/images/bk_image.jpg
+    - assets/images/product1.jpg
+    - assets/images/product2.jpg
+    - assets/images/garage1.jpg
+    - assets/images/garage2.jpg
+    - assets/images/garage3.jpg
+    - assets/images/towtruck1.jpg
+    - assets/images/towtruck2.jpg
+    - assets/images/article1.jpg
+    - assets/images/article2.jpg
+    - assets/images/bolo1.jpg
+    - assets/images/bolo2.jpg
+    # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
   # For details regarding adding assets from package dependencies, see

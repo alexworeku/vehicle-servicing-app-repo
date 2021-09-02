@@ -37,6 +37,7 @@ android {
         applicationId "com.example.vehicleservicingapp"
         minSdkVersion 16
         targetSdkVersion 30
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -53,7 +54,9 @@ android {
 flutter {
     source '../..'
 }
-
+apply plugin: 'com.google.gms.google-services'
 dependencies {
+    implementation platform('com.google.firebase:firebase-bom:28.4.0')
+    implementation 'com.google.firebase:firebase-analytics'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

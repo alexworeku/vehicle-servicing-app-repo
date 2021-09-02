@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "5481459304",
+    "project_id": "vehicle-servicing-app",
+    "storage_bucket": "vehicle-servicing-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5481459304:android:e93f85519bc47916fcd5dd",
+        "android_client_info": {
+          "package_name": "com.example.vehicleservicingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5481459304-4v11j0oq30j5srrjff1o6mu8oc0hjg2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.vehicleservicingapp",
+            "certificate_hash": "6b348ee6e78c517b6bbee045ff422217674c256b"
+          }
+        },
+        {
+          "client_id": "5481459304-a4ts2tfkplbjknq2l51rdu46vml10nfr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoJYPUvaGZkPuTs-p4PNsgP1X_UHQdTOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5481459304-a4ts2tfkplbjknq2l51rdu46vml10nfr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
