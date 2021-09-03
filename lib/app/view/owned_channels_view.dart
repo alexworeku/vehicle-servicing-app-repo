@@ -11,21 +11,18 @@ class OwnedChannelsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Channel"),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Get.to(() => CreateChannelView());
-        },
-        child: Icon(Icons.add),
-      ),
-      body: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.only(left: 8, right: 8),
-            sliver: SliverList(
-                delegate: SliverChildBuilderDelegate((ctx, index) {
+        appBar: AppBar(
+          title: Text("Channel"),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Get.to(() => CreateChannelView());
+          },
+          child: Icon(Icons.add),
+        ),
+        body: ListView.builder(
+            itemCount: channelController.channelsCount,
+            itemBuilder: (ctx, index) {
               return Column(
                 children: [
                   Slidable(
@@ -47,8 +44,15 @@ class OwnedChannelsView extends StatelessWidget {
                               channel: channelController.channels[index],
                             ));
                       },
-                      leading: CircleAvatar(
-                        child: Icon(Icons.person),
+                      leading: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: AssetImage(
+                                    channelController.channels[index].imageUrl),
+                                fit: BoxFit.cover)),
                       ),
                       title:
                           Text(channelController.channels[index].channelName),
@@ -63,10 +67,6 @@ class OwnedChannelsView extends StatelessWidget {
                   Divider()
                 ],
               );
-            }, childCount: channelController.channelsCount)),
-          )
-        ],
-      ),
-    );
+            }));
   }
 }

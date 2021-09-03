@@ -12,4 +12,8 @@ class UserController extends GetxController {
   User getUserWith(String userId) {
     return currentUser;
   }
+
+  bool isLoggedIn() {
+    return false;
+  }
 }

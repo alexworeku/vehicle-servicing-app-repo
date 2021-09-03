@@ -11,11 +11,11 @@ class ChannelController extends GetxController {
     new Channel(
         id: "article",
         channelName: "ABC PLC.",
-        channelType: "Article",
+        channelType: "Blog",
         city: "Addis abeba",
         phoneNum: 0913662761,
         rating: 2.7,
-        imageUrl: "assets/images/garage_bk.jpeg",
+        imageUrl: "assets/images/garage1.jpg",
         description:
             "Hello, welcome to my channel i am a vehicle maintenance proffesional who want to share my knowledge",
         testimonials: <String>[
@@ -62,7 +62,8 @@ class ChannelController extends GetxController {
             productName: "Car Oil",
             price: 2500,
             brand: "Italy",
-            productDescription: "Its a great product.it can last longer",
+            productDescription:
+                "Its a great product.it can last longer Its a great product.it can last longeIts a great product.it can last longeIts a great product.it can last longeIts a great product.it can last longe",
             imageUrl: "assets/images/garage_bk.jpeg",
             date: DateTime.now().toString(),
             channelId: "accessory"),
@@ -70,7 +71,8 @@ class ChannelController extends GetxController {
             productName: "Car Oil",
             price: 2500,
             brand: "Italy",
-            productDescription: "Its a great product.it can last longer",
+            productDescription:
+                "Its a great product.it can last longeIts a great product.it can last longeIts a great product.it can last longer Its a great product.it can last longe",
             imageUrl: "assets/images/garage_bk.jpeg",
             date: DateTime.now().toString(),
             channelId: "accessory"),
@@ -108,6 +110,7 @@ class ChannelController extends GetxController {
         new ServicePost(
             serviceName: "Tow-Truck",
             price: 500,
+            serviceType: "Tow-Truck",
             serviceDescription:
                 "We will help you move your vehicle from one place to another",
             imageUrl: "assets/images/garage_bk.jpeg",
@@ -120,6 +123,7 @@ class ChannelController extends GetxController {
             date: DateTime.now().toString(),
             channelId: "service"),
         new ServicePost(
+            serviceType: "Tow-Truck",
             serviceName: "Tow-Truck",
             price: 500,
             serviceDescription:
@@ -134,6 +138,7 @@ class ChannelController extends GetxController {
             date: DateTime.now().toString(),
             channelId: "service"),
         new ServicePost(
+            serviceType: "Tow-Truck",
             serviceName: "Tow-Truck",
             price: 500,
             serviceDescription:
@@ -230,7 +235,7 @@ class ChannelController extends GetxController {
   }
 
   List<String> getChannelTypes() {
-    return <String>["Service", "Accessory", "Article"];
+    return <String>["Garage", "Accessory", "Tow-truck", "Bolo-Service", "Blog"];
   }
 
   Future<Channel> getChannelById(String channelId) async {

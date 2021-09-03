@@ -33,21 +33,34 @@ class VerifyPhoneView extends StatelessWidget {
                 ),
                 Text(
                   "Phone verification",
-                  style: Get.theme.textTheme.headline4,
+                  style: Get.theme.textTheme.headline6,
                 ),
                 SizedBox(
-                  height: 12,
+                  height: 6,
                 ),
                 Text(
                   "We have sent you an sms with a code.",
-                  style: Get.theme.textTheme.subtitle2,
+                  style: Get.theme.textTheme.bodyText1,
                 ),
-                SizedBox(height: Get.height * 0.1),
+                SizedBox(height: Get.height * 0.05),
                 TextFormField(
-                  decoration: InputDecoration(labelText: "Enter sms code"),
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: "Enter sms code"),
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 10,
+                ),
+                SizedBox(
+                  width: Get.width,
+                  height: 54,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        //TO HomeView
+                        Get.close(1);
+                        Get.to(() => HomeView());
+                      },
+                      child: Text("Verify")),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -65,13 +78,6 @@ class VerifyPhoneView extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      //TO HomeView
-                      Get.close(1);
-                      Get.to(() => HomeView());
-                    },
-                    child: Text("Verify"))
               ],
             ),
           ),

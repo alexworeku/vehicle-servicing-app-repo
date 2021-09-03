@@ -15,7 +15,7 @@ class CreateChannelView extends StatefulWidget {
 
 class _CreateChannelViewState extends State<CreateChannelView> {
   final _formKey = GlobalKey<FormState>();
-  String selectedChannelType = "Service";
+  String selectedChannelType = "Garage";
   String selectedCity = "Addis Abeba";
   bool locationSelected = true;
   @override

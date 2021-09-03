@@ -57,6 +57,7 @@ class _SignUpViewState extends State<SignUpView> {
                 TextFormField(
                     controller: _nameController,
                     decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.person),
                         labelText: "Full name")),
                 SizedBox(
@@ -65,6 +66,7 @@ class _SignUpViewState extends State<SignUpView> {
                 TextFormField(
                     controller: _phoneController,
                     decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.phone),
                         labelText: "Phone number")),
                 SizedBox(
@@ -72,6 +74,7 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(
+                    border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.location_history),
                   ),
                   hint: Text("Current city"),
@@ -86,13 +89,17 @@ class _SignUpViewState extends State<SignUpView> {
                       .toList(),
                 ),
                 SizedBox(
-                  height: 25,
+                  height: 14,
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => VerifyPhoneView());
-                    },
-                    child: Text("Create Account")),
+                SizedBox(
+                  height: 54,
+                  width: Get.width,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Get.to(() => VerifyPhoneView());
+                      },
+                      child: Text("Create Account")),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

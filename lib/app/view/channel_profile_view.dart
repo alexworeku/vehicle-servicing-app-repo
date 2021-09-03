@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
+import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
 import 'package:vehicleservicingapp/app/data/model/article_post.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
-import 'package:vehicleservicingapp/app/data/model/post.dart';
-import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
 import 'package:vehicleservicingapp/app/data/model/service_post.dart';
 import 'package:vehicleservicingapp/app/view/create_article_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_product_post_view.dart';
@@ -13,8 +12,12 @@ import 'package:vehicleservicingapp/app/view/create_channel_view.dart';
 import 'package:vehicleservicingapp/app/view/map_view.dart';
 import 'package:vehicleservicingapp/app/view/rating_view.dart';
 import 'package:vehicleservicingapp/app/view/testimonial_view.dart';
+import 'package:vehicleservicingapp/app/view/vehicles_view.dart';
 
-import 'package:vehicleservicingapp/app/view/voice_call_view.dart';
+import 'package:vehicleservicingapp/app/view/widgets/accessory_post_card_view.dart';
+
+import 'package:vehicleservicingapp/app/view/widgets/article_post_card_view.dart';
+import 'package:vehicleservicingapp/app/view/widgets/service_post_card_widget.dart';
 
 class ChannelProfileView extends StatelessWidget {
   final Channel channel;
@@ -22,88 +25,22 @@ class ChannelProfileView extends StatelessWidget {
   const ChannelProfileView({Key key, this.channel, this.isAdmin})
       : super(key: key);
 
-  Widget _getPostWidget(Post p) {
-    return Column(
-      // crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: Get.width * 0.7),
-                      child: Text(
-                          (p is AccessoryPost
-                              ? p.productName
-                              : (p is ArticlePost
-                                  ? p.title
-                                  : (p as ServicePost).serviceName)),
-                          style: Get.theme.textTheme.headline6),
-                    ),
-                    ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: Get.width * 0.1),
-                      child: Text(
-                        (p is AccessoryPost
-                            ? p.price.toString() + " Birr"
-                            : (p is ArticlePost
-                                ? p.duration.toString() + " min"
-                                : (p as ServicePost).price.toString() +
-                                    " Birr")),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                p is AccessoryPost ? Text(p.brand) : Container(),
-                Text(
-                  (p is AccessoryPost
-                      ? p.productDescription
-                      : (p is ArticlePost
-                          ? p.content
-                          : (p as ServicePost).serviceDescription)),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Image(
-                  image: AssetImage(p.imageUrl),
-                  fit: BoxFit.contain,
-                )
-              ],
-            ),
-          ),
-        ),
-        p is ArticlePost
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.thumb_up_sharp),
-                        onPressed: () {},
-                      ),
-                      Text(p.likes.toString())
-                    ],
-                  ),
-                  IconButton(icon: Icon(Icons.bookmark), onPressed: () {})
-                ],
-              )
-            : Container()
-      ],
-    );
-  }
-
   List<Widget> _getPosts() {
     return Get.find<ChannelController>().getPosts(channel.id).map((e) {
-      return _getPostWidget(e);
+      if (channel.channelType == "Accessory") {
+        return AccessoryPostCardView(
+          accessoryPost: (e as AccessoryPost),
+          isForAdmin: true,
+        );
+      } else if (channel.channelType == "Service") {
+        return ServicePostCardWidget(
+          servicePost: e as ServicePost,
+          channel: channel,
+          isForAdmin: true,
+        );
+      } else {
+        return ArticlePostCardView(post: e as ArticlePost, isForAdmin: true);
+      }
     }).toList();
   }
 
@@ -122,7 +59,7 @@ class ChannelProfileView extends StatelessWidget {
                     Get.to(() => CreateServicePostView());
 
                     break;
-                  case "Article":
+                  case "Blog":
                     Get.to(() => CreateArticlePostView());
                     break;
                 }
@@ -144,10 +81,7 @@ class ChannelProfileView extends StatelessWidget {
               : IconButton(
                   icon: Icon(Icons.call),
                   onPressed: () {
-                    Get.to(() => VoiceCallView(
-                          imageUrl: channel.imageUrl,
-                          name: channel.channelName,
-                        ));
+                    //TODO:Open default phone app
                   })
         ],
       ),
@@ -176,7 +110,7 @@ class ChannelProfileView extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              Text(channel.channelName, style: Get.theme.textTheme.headline5),
+              Text(channel.channelName, style: Get.theme.textTheme.headline6),
               SizedBox(
                 height: 5,
               ),
@@ -185,12 +119,12 @@ class ChannelProfileView extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.location_on,
-                    size: 15,
+                    size: 14,
                   ),
                   SizedBox(
                     width: 5,
                   ),
-                  Text(channel.city, style: Get.theme.textTheme.subtitle2),
+                  Text(channel.city, style: Get.theme.textTheme.subtitle1),
                 ],
               ),
               SizedBox(
@@ -201,14 +135,13 @@ class ChannelProfileView extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.phone,
-                    size: 15,
+                    size: 14,
                   ),
                   SizedBox(
                     width: 5,
                   ),
-                  Text(
-                    channel.phoneNum.toString(),
-                  ),
+                  Text(channel.phoneNum.toString(),
+                      style: Get.theme.textTheme.bodyText2),
                 ],
               ),
               SizedBox(
@@ -216,14 +149,19 @@ class ChannelProfileView extends StatelessWidget {
               ),
               Divider(),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Column(
                     children: [
                       IconButton(
-                          icon: Icon(Icons.car_repair), onPressed: () {}),
+                          icon: Icon(
+                            Icons.comment,
+                          ),
+                          onPressed: () {
+                            Get.to(() => GiveTestimonialView());
+                          }),
                       Text(
-                        "Vehicles",
+                        channel.testimonials.length.toString(),
                         style: Get.theme.textTheme.subtitle2,
                       )
                     ],
@@ -246,34 +184,37 @@ class ChannelProfileView extends StatelessWidget {
                       )
                     ],
                   ),
-                  Column(
-                    children: [
-                      IconButton(
-                          icon: Icon(
-                            Icons.comment,
-                          ),
-                          onPressed: () {
-                            Get.to(() => GiveTestimonialView());
-                          }),
-                      Text(
-                        channel.testimonials.length.toString(),
-                        style: Get.theme.textTheme.subtitle2,
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                          icon: Icon(Icons.add_location),
-                          onPressed: () {
-                            Get.to(() => MapView());
-                          }),
-                      Text(
-                        isAdmin ? "Set location" : "View on map",
-                        style: Get.theme.textTheme.subtitle2,
-                      )
-                    ],
-                  ),
+                  channel.channelType == "Service" ||
+                          channel.channelType == "Accessory"
+                      ? Column(
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.add_location),
+                                onPressed: () {
+                                  Get.to(() => MapView());
+                                }),
+                            Text(
+                              isAdmin ? "Set location" : "View on map",
+                              style: Get.theme.textTheme.subtitle2,
+                            )
+                          ],
+                        )
+                      : Container(),
+                  channel.channelType == "Service"
+                      ? Column(
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.car_repair),
+                                onPressed: () {
+                                  Get.to(() => VehiclesView());
+                                }),
+                            Text(
+                              "Vehicles",
+                              style: Get.theme.textTheme.subtitle2,
+                            )
+                          ],
+                        )
+                      : Container()
                 ],
               ),
               SizedBox(
@@ -301,7 +242,7 @@ class ChannelProfileView extends StatelessWidget {
                 ? Column(
                     children: _getPosts(),
                   )
-                : Text("No posts yet"),
+                : Text("No posts yet", style: Get.theme.textTheme.bodyText2),
             Divider(),
             Align(
               alignment: Alignment.centerLeft,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/data/model/user.dart';
-import 'package:vehicleservicingapp/app/view/voice_call_view.dart';
 
 class UserProfileView extends StatelessWidget {
   final User user;
@@ -16,10 +15,7 @@ class UserProfileView extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.call),
               onPressed: () {
-                Get.to(() => VoiceCallView(
-                      name: user.fullName,
-                      imageUrl: user.profileImageUrl,
-                    ));
+                //TODO:OPen Default Phone App
               }),
           SizedBox(
             width: 30,

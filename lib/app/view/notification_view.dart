@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/notification_controller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/view/user_profile_view.dart';
-import 'package:vehicleservicingapp/app/view/voice_call_view.dart';
 
 class NotificationView extends StatelessWidget {
   NotificationView({Key key}) : super(key: key);
@@ -40,16 +39,7 @@ class NotificationView extends StatelessWidget {
                     trailing: IconButton(
                       icon: Icon(Icons.call),
                       onPressed: () {
-                        Get.to(() => VoiceCallView(
-                              name: Get.find<UserController>()
-                                  .getUserWith(notificationController
-                                      .notifications[index].userId)
-                                  .fullName,
-                              imageUrl: Get.find<UserController>()
-                                  .getUserWith(notificationController
-                                      .notifications[index].userId)
-                                  .profileImageUrl,
-                            ));
+                        //TODO:Open default phone app
                       },
                     ),
                     subtitle: Column(

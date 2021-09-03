@@ -39,15 +39,6 @@ class _SettingsViewState extends State<SettingsView> {
                     user: Get.find<UserController>().currentUser));
               },
             ),
-            SwitchListTile(
-              title: Text("Hide Phone"),
-              value: _hidePhone,
-              onChanged: (value) {
-                setState(() {
-                  _hidePhone = value;
-                });
-              },
-            ),
             Divider(),
             ListTile(
               title: Text("Servicing Date"),

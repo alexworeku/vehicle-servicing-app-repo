@@ -6,11 +6,14 @@ import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/controller/notification_controller.dart';
 import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
+import 'package:vehicleservicingapp/app/view/articles_view.dart';
 import 'package:vehicleservicingapp/app/view/notification_view.dart';
 import 'package:vehicleservicingapp/app/view/owned_channels_view.dart';
 import 'package:vehicleservicingapp/app/view/accessory_posts_view.dart';
+import 'package:vehicleservicingapp/app/view/saved_articles_view.dart';
 import 'package:vehicleservicingapp/app/view/services_view.dart';
 import 'package:vehicleservicingapp/app/view/settings_view.dart';
+import 'package:vehicleservicingapp/app/view/signup_and_login_views/login_view.dart';
 import 'package:vehicleservicingapp/app/view/widgets/category_item.dart';
 import 'package:vehicleservicingapp/app/view/widgets/channel_card_widget.dart';
 
@@ -43,8 +46,8 @@ class _HomeViewState extends State<HomeView> {
                 case 2:
                   Get.to(() => NotificationView());
                   break;
-                case 4:
-                  Get.to(() => SettingsView());
+                case 3:
+                  Get.to(() => SavedArticlesView());
                   break;
               }
             },
@@ -68,15 +71,21 @@ class _HomeViewState extends State<HomeView> {
           ),
           actions: [
             IconButton(icon: Icon(Icons.search), onPressed: () {}),
-            Padding(
-              padding: EdgeInsets.only(right: 10),
-              child: CircleAvatar(
-                child: IconButton(
-                  icon: Icon(Icons.person),
-                  onPressed: () {},
-                ),
-              ),
-            )
+            userController.isLoggedIn()
+                ? Padding(
+                    padding: EdgeInsets.only(right: 10),
+                    child: CircleAvatar(
+                      child: IconButton(
+                        icon: Icon(Icons.person),
+                        onPressed: () {},
+                      ),
+                    ),
+                  )
+                : TextButton(
+                    onPressed: () {
+                      Get.to(() => LoginView());
+                    },
+                    child: Text("Login"))
           ],
         ),
         body: Padding(
@@ -96,8 +105,7 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       InkWell(
                           onTap: () {
-                            Get.to(
-                                () => ServicesView(typeOfService: "Garages"));
+                            Get.to(() => ServicesView(serviceType: "Garage"));
                           },
                           child: CategoryItem(categoryName: "Garages")),
                       InkWell(
@@ -105,9 +113,25 @@ class _HomeViewState extends State<HomeView> {
                             Get.to(() => AccessoryPostsView());
                           },
                           child: CategoryItem(categoryName: "Accessories")),
-                      CategoryItem(categoryName: "Tow-Trucks"),
-                      CategoryItem(categoryName: "Bolo-Service"),
-                      CategoryItem(categoryName: "Articles"),
+                      InkWell(
+                          onTap: () {
+                            Get.to(ServicesView(
+                              serviceType: "Tow-Truck",
+                            ));
+                          },
+                          child: CategoryItem(categoryName: "Tow-Trucks")),
+                      InkWell(
+                          onTap: () {
+                            Get.to(ServicesView(
+                              serviceType: "Bolo-Service",
+                            ));
+                          },
+                          child: CategoryItem(categoryName: "Bolo-Service")),
+                      InkWell(
+                          onTap: () {
+                            Get.to(() => ArticlesView());
+                          },
+                          child: CategoryItem(categoryName: "Articles")),
                     ],
                   ),
                 ),

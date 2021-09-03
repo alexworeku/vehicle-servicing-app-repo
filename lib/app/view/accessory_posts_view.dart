@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
+import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
+import 'package:vehicleservicingapp/app/data/model/channel.dart';
+import 'package:vehicleservicingapp/app/view/post_detail_view.dart';
 import 'package:vehicleservicingapp/app/view/widgets/accessory_post_card_view.dart';
 
 class AccessoryPostsView extends StatelessWidget {
@@ -27,9 +30,22 @@ class AccessoryPostsView extends StatelessWidget {
             itemBuilder: (context, index) {
               AccessoryPost post =
                   Get.find<AccessoryPostController>().getAllPosts()[index];
-              return AccessoryPostCardView(
-                accessoryPost: post,
-              );
+              return FutureBuilder<Channel>(
+                  future: Get.find<ChannelController>()
+                      .getChannelById(post.channelId),
+                  builder: (context, snapshot) {
+                    return InkWell(
+                      onTap: () {
+                        Get.to(() => PostDetailView(
+                              post: post,
+                              channel: snapshot.data,
+                            ));
+                      },
+                      child: AccessoryPostCardView(
+                        accessoryPost: post,
+                      ),
+                    );
+                  });
             },
             staggeredTileBuilder: (index) => StaggeredTile.fit(1)),
       ),

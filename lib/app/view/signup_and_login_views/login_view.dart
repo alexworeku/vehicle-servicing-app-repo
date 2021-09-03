@@ -32,8 +32,11 @@ class LoginView extends StatelessWidget {
                 child: Icon(Icons.person),
                 radius: 40,
               ),
+              SizedBox(
+                height: 5,
+              ),
               Text(
-                "Welcome Back",
+                "Welcome back",
                 style: Get.theme.textTheme.headline4,
               ),
               Text(
@@ -41,28 +44,35 @@ class LoginView extends StatelessWidget {
                 style: Get.theme.textTheme.headline6,
               ),
               SizedBox(
-                height: Get.height * 0.1,
+                height: Get.height * 0.05,
               ),
               TextField(
-                decoration: InputDecoration(labelText: "Phone number"),
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Enter phone number"),
               ),
+              
               SizedBox(
                 height: 12,
               ),
-              ElevatedButton(
-                  onPressed: () {
-                    Get.to(() => VerifyPhoneView());
-                  },
-                  child: Text("Login")),
               SizedBox(
-                height: 25,
+                height: 54,
+                width: Get.width,
+                child: ElevatedButton(
+                    onPressed: () {
+                      Get.to(() => VerifyPhoneView());
+                    },
+                    child: Text("Login")),
+              ),
+              SizedBox(
+                height: 5,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "Didn't have account ?",
-                    style: Get.theme.textTheme.subtitle2,
+                    style: Get.theme.textTheme.bodyText2,
                   ),
                   SizedBox(
                     width: 5,
