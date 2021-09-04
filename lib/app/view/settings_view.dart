@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
+import 'package:vehicleservicingapp/app/data/model/app_user.dart';
 import 'package:vehicleservicingapp/app/view/edit_user_profile_view.dart';
 
 class SettingsView extends StatefulWidget {
@@ -18,66 +19,66 @@ class _SettingsViewState extends State<SettingsView> {
       padding: const EdgeInsets.all(5.0),
       child: SizedBox(
         height: Get.height,
-        child: ListView(
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                padding: EdgeInsets.all(5),
-                onPressed: () {
-                  Get.back();
-                },
-                icon: Icon(Icons.arrow_back),
-              ),
-            ),
-            Divider(),
-            ListTile(
-              title: Text("Edit profile"),
-              trailing: Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                Get.to(() => EditUserProfileView(
-                    user: Get.find<UserController>().currentUser));
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: Text("Servicing Date"),
-              trailing: Icon(Icons.calendar_today),
-              onTap: () {
-                Get.to(() => EditUserProfileView(
-                    user: Get.find<UserController>().currentUser));
-              },
-            ),
-            Divider(),
-            SwitchListTile(
-              title: Text("Servicing alarm"),
-              value: _servicingAlarm,
-              onChanged: (value) {
-                setState(() {
-                  _servicingAlarm = value;
-                });
-              },
-            ),
-            Divider(),
-            SwitchListTile(
-              title: Text("Dark Mode"),
-              value: _isDarkMode,
-              onChanged: (value) {
-                setState(() {
-                  _isDarkMode = value;
-                });
-              },
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                  },
-                  child: Text("Logout")),
-            )
-          ],
-        ),
+        child: Obx(() => Get.find<UserController>().isLoggedIn.value
+            ? ListView(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      padding: EdgeInsets.all(5),
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Edit profile"),
+                    trailing: Icon(Icons.keyboard_arrow_right),
+                    onTap: () {
+                      Get.to(() => EditUserProfileView());
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Servicing Date"),
+                    trailing: Icon(Icons.calendar_today),
+                    onTap: () {},
+                  ),
+                  Divider(),
+                  SwitchListTile(
+                    title: Text("Servicing alarm"),
+                    value: _servicingAlarm,
+                    onChanged: (value) {
+                      setState(() {
+                        _servicingAlarm = value;
+                      });
+                    },
+                  ),
+                  Divider(),
+                  SwitchListTile(
+                    title: Text("Dark Mode"),
+                    value: _isDarkMode,
+                    onChanged: (value) {
+                      setState(() {
+                        _isDarkMode = value;
+                      });
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          await Get.find<UserController>().signOut();
+
+                          Get.back();
+                        },
+                        child: Text("Logout")),
+                  )
+                ],
+              )
+            : Center(child: Text("Please sign in first!"))),
       ),
     );
   }

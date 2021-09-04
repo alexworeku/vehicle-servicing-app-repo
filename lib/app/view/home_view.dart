@@ -1,11 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/controller/notification_controller.dart';
 import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
+import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
+import 'package:vehicleservicingapp/app/data/model/app_user.dart';
+import 'package:vehicleservicingapp/app/data/model/article_post.dart';
+import 'package:vehicleservicingapp/app/data/repository/accessory_repository.dart';
+import 'package:vehicleservicingapp/app/data/repository/article_post_repository.dart';
+import 'package:vehicleservicingapp/app/data/repository/channel_repository.dart';
+import 'package:vehicleservicingapp/app/data/repository/user_repository.dart';
 import 'package:vehicleservicingapp/app/view/articles_view.dart';
 import 'package:vehicleservicingapp/app/view/notification_view.dart';
 import 'package:vehicleservicingapp/app/view/owned_channels_view.dart';
@@ -15,7 +24,6 @@ import 'package:vehicleservicingapp/app/view/services_view.dart';
 import 'package:vehicleservicingapp/app/view/settings_view.dart';
 import 'package:vehicleservicingapp/app/view/signup_and_login_views/login_view.dart';
 import 'package:vehicleservicingapp/app/view/widgets/category_item.dart';
-import 'package:vehicleservicingapp/app/view/widgets/channel_card_widget.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({Key key}) : super(key: key);
@@ -28,10 +36,14 @@ class _HomeViewState extends State<HomeView> {
   int _selectedNavBarIndex = 0;
 
   var notificationController = Get.put(new NotificationController());
-  var userController = Get.put(new UserController());
-  var productController = Get.put(new AccessoryPostController());
-  var channelController = Get.put(new ChannelController());
-  var articleController = Get.put(new ArticlePostController());
+  var userController =
+      Get.put(new UserController(userRepository: new UserRepository()));
+  var accssoryController =
+      Get.put(new AccessoryPostController(new AccessoryRepository()));
+  var channelController =
+      Get.put(new ChannelController(new ChannelRepository()));
+  var articleController =
+      Get.put(new ArticlePostController(new ArticlePostrepository()));
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,21 +83,41 @@ class _HomeViewState extends State<HomeView> {
           ),
           actions: [
             IconButton(icon: Icon(Icons.search), onPressed: () {}),
-            userController.isLoggedIn()
+            Obx(() => userController.isLoggedIn.value
                 ? Padding(
-                    padding: EdgeInsets.only(right: 10),
-                    child: CircleAvatar(
-                      child: IconButton(
-                        icon: Icon(Icons.person),
-                        onPressed: () {},
-                      ),
-                    ),
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: FutureBuilder<AppUser>(
+                        future: userController.getCurrentUser(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            debugPrint("Error:" + snapshot.error.toString());
+                            return Text("Error");
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            return CachedNetworkImage(
+                              imageUrl: snapshot.data.profileImageUrl,
+                              placeholder: (ctx, imgProvider) => SpinKitCircle(
+                                  color: Get.theme.primaryColor, size: 12),
+                              errorWidget: (ctx, url, error) =>
+                                  Icon(Icons.error),
+                              imageBuilder: (ctx, imgProvider) {
+                                return CircleAvatar(
+                                    radius: 20, backgroundImage: imgProvider);
+                              },
+                            );
+                          }
+                          return SpinKitCircle(
+                            size: 12,
+                            color: Get.theme.primaryColor,
+                          );
+                        }),
                   )
                 : TextButton(
                     onPressed: () {
                       Get.to(() => LoginView());
                     },
-                    child: Text("Login"))
+                    child: Text("Login"))),
           ],
         ),
         body: Padding(
@@ -159,49 +191,55 @@ class _HomeViewState extends State<HomeView> {
               ),
               Container(
                 width: Get.width,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      children: productController
-                          .getAllPosts()
-                          .map((p) => InkWell(
-                                onTap: () {},
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                        child: Image(
-                                            width: Get.width * 0.3,
-                                            height: Get.width * 0.3,
-                                            fit: BoxFit.cover,
-                                            image: AssetImage(p.imageUrl)),
+                child: FutureBuilder<List<AccessoryPost>>(
+                    future: accssoryController.getAllPosts(),
+                    builder: (context, snapshot) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                            children: snapshot.data
+                                .map((p) => InkWell(
+                                      onTap: () {},
+                                      child: Container(
+                                        margin: EdgeInsets.only(right: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // ClipRRect(
+                                            //   borderRadius: BorderRadius.all(
+                                            //       Radius.circular(10)),
+                                            //   child: Image(
+                                            //       width: Get.width * 0.3,
+                                            //       height: Get.width * 0.3,
+                                            //       fit: BoxFit.cover,
+                                            //       image: AssetImage(p.imageUrl)),
+                                            // ),
+                                            SizedBox(
+                                              height: 8,
+                                            ),
+                                            Text(
+                                              p.productName,
+                                              overflow: TextOverflow.ellipsis,
+                                              style:
+                                                  Get.theme.textTheme.bodyText1,
+                                            ),
+                                            Text(
+                                              p.price.toString(),
+                                              overflow: TextOverflow.ellipsis,
+                                              style: Get
+                                                  .theme.textTheme.bodyText1
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      SizedBox(
-                                        height: 8,
-                                      ),
-                                      Text(
-                                        p.productName,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Get.theme.textTheme.bodyText1,
-                                      ),
-                                      Text(
-                                        p.price.toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Get.theme.textTheme.bodyText1
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ))
-                          .toList()),
-                ),
+                                    ))
+                                .toList()),
+                      );
+                    }),
               ),
               Divider(
                 thickness: 0,
@@ -225,25 +263,8 @@ class _HomeViewState extends State<HomeView> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: channelController
-                          .getGarageChannels()
-                          .map(
-                            (c) => InkWell(
-                              child: ChannelCardWidget(
-                                channelName: c.channelName,
-                                city: c.city,
-                                rating: c.rating,
-                                image: Image(
-                                  width: Get.width * 0.6,
-                                  height: Get.width * 0.45,
-                                  image: AssetImage(c.imageUrl),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList()),
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ),
                 ),
               ),
               Row(
@@ -266,22 +287,8 @@ class _HomeViewState extends State<HomeView> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                      children: channelController
-                          .getTowtruckChannels()
-                          .map((c) => InkWell(
-                                child: ChannelCardWidget(
-                                  channelName: c.channelName,
-                                  city: c.city,
-                                  rating: c.rating,
-                                  image: Image(
-                                    width: Get.width * 0.6,
-                                    height: Get.width * 0.45,
-                                    image: AssetImage(c.imageUrl),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ))
-                          .toList()),
+//load tow trucks
+                      ),
                 ),
               ),
               Row(
@@ -304,22 +311,8 @@ class _HomeViewState extends State<HomeView> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                      children: channelController
-                          .getBoloServiceProviderChannel()
-                          .map((c) => InkWell(
-                                child: ChannelCardWidget(
-                                  channelName: c.channelName,
-                                  city: c.city,
-                                  rating: c.rating,
-                                  image: Image(
-                                    width: Get.width * 0.6,
-                                    height: Get.width * 0.45,
-                                    image: AssetImage(c.imageUrl),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ))
-                          .toList()),
+                      //load
+                      ),
                 ),
               ),
               Row(
@@ -339,73 +332,83 @@ class _HomeViewState extends State<HomeView> {
               ),
               Container(
                 width: Get.width,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      children: articleController
-                          .getAllPosts()
-                          .map((a) => InkWell(
-                                  child: Card(
-                                child: Container(
-                                  width: Get.width * 0.6,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: Get.width * 0.6,
-                                        ),
-                                        child: Text(
-                                          a.title,
-                                          style: Get.theme.textTheme.subtitle1,
-                                        ),
-                                      ),
-                                      ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: Get.width * 0.6,
-                                        ),
-                                        child: Text(
-                                          a.content,
-                                          style: Get.theme.textTheme.bodyText1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Image(
-                                          width: Get.width * 0.6,
-                                          height: Get.width * 0.45,
-                                          image: AssetImage(a.imageUrl)),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 4.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                child: FutureBuilder<List<ArticlePost>>(
+                    future: articleController.getHighestRatedArticles(),
+                    builder: (context, snapshot) {
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                            children: snapshot.data
+                                .map((a) => InkWell(
+                                        child: Card(
+                                      child: Container(
+                                        width: Get.width * 0.6,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            Row(
-                                              children: [
-                                                Icon(Icons.thumb_up_alt_sharp),
-                                                SizedBox(
-                                                  width: 4,
-                                                ),
-                                                Text(
-                                                  a.likes.toString(),
-                                                  style: Get.theme.textTheme
-                                                      .bodyText2,
-                                                )
-                                              ],
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: Get.width * 0.6,
+                                              ),
+                                              child: Text(
+                                                a.title,
+                                                style: Get
+                                                    .theme.textTheme.subtitle1,
+                                              ),
                                             ),
-                                            Text(a.duration.toString() +
-                                                " min read")
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: Get.width * 0.6,
+                                              ),
+                                              child: Text(
+                                                a.content,
+                                                style: Get
+                                                    .theme.textTheme.bodyText1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            // Image(
+                                            //     width: Get.width * 0.6,
+                                            //     height: Get.width * 0.45,
+                                            //     image: AssetImage(a.imageUrl)),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 4.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons
+                                                          .thumb_up_alt_sharp),
+                                                      SizedBox(
+                                                        width: 4,
+                                                      ),
+                                                      Text(
+                                                        a.likes.toString(),
+                                                        style: Get
+                                                            .theme
+                                                            .textTheme
+                                                            .bodyText2,
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Text(a.duration.toString() +
+                                                      " min read")
+                                                ],
+                                              ),
+                                            )
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )))
-                          .toList()),
-                ),
+                                      ),
+                                    )))
+                                .toList()),
+                      );
+                    }),
               ),
             ]),
           ),

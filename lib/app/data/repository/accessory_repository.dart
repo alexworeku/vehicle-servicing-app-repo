@@ -50,4 +50,30 @@ class AccessoryRepository implements IAccessoryRepository {
         FirebaseFirestore.instance.collection("Accessories");
     return collectionRef.doc(id).delete();
   }
+
+  @override
+  Future<List<AccessoryPost>> getOwnedPosts(String channelId) async {
+    var accessoriesRef = await FirebaseFirestore.instance
+        .collection("Accessories")
+        .where('ChannelId', isEqualTo: channelId)
+        .get();
+    List<AccessoryPost> posts = [];
+    accessoriesRef.docs.forEach((doc) {
+      posts.add(AccessoryPost.fromMap(doc.id, doc.data()));
+    });
+    return posts;
+  }
+
+  @override
+  Future<List<AccessoryPost>> getTop(int limit) async {
+    var accessoriesRef = await FirebaseFirestore.instance
+        .collection("Accessories")
+        .limit(limit)
+        .get();
+    List<AccessoryPost> posts = [];
+    accessoriesRef.docs.forEach((doc) {
+      posts.add(AccessoryPost.fromMap(doc.id, doc.data()));
+    });
+    return posts;
+  }
 }

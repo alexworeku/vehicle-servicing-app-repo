@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vehicleservicingapp/app/data/model/user.dart';
+import 'package:vehicleservicingapp/app/data/model/app_user.dart';
 
 class UserProfileView extends StatelessWidget {
-  final User user;
+  final AppUser user;
   const UserProfileView({Key key, this.user}) : super(key: key);
 
   @override

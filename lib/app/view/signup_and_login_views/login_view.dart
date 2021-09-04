@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/user_controller.dart';
+import 'package:vehicleservicingapp/app/data/model/app_user.dart';
 import 'package:vehicleservicingapp/app/view/signup_and_login_views/signup_view.dart';
-import 'package:vehicleservicingapp/app/view/signup_and_login_views/verify_phone_view.dart';
 
 class LoginView extends StatelessWidget {
-  const LoginView({Key key}) : super(key: key);
+  final TextEditingController phonecontroller = new TextEditingController();
+  LoginView({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +49,11 @@ class LoginView extends StatelessWidget {
                 height: Get.height * 0.05,
               ),
               TextField(
+                controller: phonecontroller,
                 decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Enter phone number"),
               ),
-              
               SizedBox(
                 height: 12,
               ),
@@ -59,8 +61,17 @@ class LoginView extends StatelessWidget {
                 height: 54,
                 width: Get.width,
                 child: ElevatedButton(
-                    onPressed: () {
-                      Get.to(() => VerifyPhoneView());
+                    onPressed: () async {
+                      var controller = Get.find<UserController>();
+
+                      if (await controller
+                          .isUserRegistered(phonecontroller.text.trim())) {
+                        await controller.verifyUserByPhone(
+                            new AppUser(phoneNo: phonecontroller.text.trim()));
+                      } else {
+                        Get.snackbar(
+                            "Account does not exist!", "Please Sign up first");
+                      }
                     },
                     child: Text("Login")),
               ),

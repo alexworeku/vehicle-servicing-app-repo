@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/user_controller.dart';
+import 'package:vehicleservicingapp/app/data/model/app_user.dart';
 
 import 'package:vehicleservicingapp/app/view/signup_and_login_views/login_view.dart';
 import 'package:vehicleservicingapp/app/view/signup_and_login_views/verify_phone_view.dart';
@@ -16,8 +18,10 @@ class _SignUpViewState extends State<SignUpView> {
   TextEditingController _nameController = new TextEditingController(),
       _phoneController = new TextEditingController();
   var cities = <String>["Addis Abeba", "Adama", "Bahir Dar"];
+
   @override
   Widget build(BuildContext context) {
+    var _selectedCity = cities[0];
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -77,14 +81,21 @@ class _SignUpViewState extends State<SignUpView> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.location_history),
                   ),
-                  hint: Text("Current city"),
-                  onChanged: (selectedValue) {},
+                  value: _selectedCity,
+                  onChanged: (selectedValue) {
+                    setState(() {
+                      _selectedCity = selectedValue;
+                    });
+                  },
                   validator: (newValue) {
                     return null;
                   },
                   items: cities
                       .map<DropdownMenuItem<String>>(
-                        (e) => DropdownMenuItem<String>(child: Text(e)),
+                        (e) => DropdownMenuItem<String>(
+                          value: e,
+                          child: Text(e),
+                        ),
                       )
                       .toList(),
                 ),
@@ -95,8 +106,13 @@ class _SignUpViewState extends State<SignUpView> {
                   height: 54,
                   width: Get.width,
                   child: ElevatedButton(
-                      onPressed: () {
-                        Get.to(() => VerifyPhoneView());
+                      onPressed: () async {
+                        AppUser user = new AppUser(
+                            phoneNo: _phoneController.text.trim(),
+                            city: _selectedCity,
+                            fullName: _nameController.text);
+                        var userController = Get.find<UserController>();
+                        await userController.verifyUserByPhone(user);
                       },
                       child: Text("Create Account")),
                 ),

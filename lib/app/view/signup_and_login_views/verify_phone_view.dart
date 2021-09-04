@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vehicleservicingapp/app/view/home_view.dart';
 
 class VerifyPhoneView extends StatelessWidget {
-  const VerifyPhoneView({Key key}) : super(key: key);
+  final Function onSmsCodeEntered;
+  final TextEditingController _smsCodeController = new TextEditingController();
+  VerifyPhoneView({Key key, @required this.onSmsCodeEntered}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +45,7 @@ class VerifyPhoneView extends StatelessWidget {
                 ),
                 SizedBox(height: Get.height * 0.05),
                 TextFormField(
+                  controller: _smsCodeController,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: "Enter sms code"),
@@ -56,9 +58,7 @@ class VerifyPhoneView extends StatelessWidget {
                   height: 54,
                   child: ElevatedButton(
                       onPressed: () {
-                        //TO HomeView
-                        Get.close(1);
-                        Get.to(() => HomeView());
+                        onSmsCodeEntered(_smsCodeController.text.trim());
                       },
                       child: Text("Verify")),
                 ),

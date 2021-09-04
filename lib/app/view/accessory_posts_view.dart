@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
@@ -22,32 +23,48 @@ class AccessoryPostsView extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
-        child: StaggeredGridView.countBuilder(
-            crossAxisCount: 2,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5,
-            itemCount: Get.find<AccessoryPostController>().getPostsCount(),
-            itemBuilder: (context, index) {
-              AccessoryPost post =
-                  Get.find<AccessoryPostController>().getAllPosts()[index];
-              return FutureBuilder<Channel>(
-                  future: Get.find<ChannelController>()
-                      .getChannelById(post.channelId),
-                  builder: (context, snapshot) {
-                    return InkWell(
-                      onTap: () {
-                        Get.to(() => PostDetailView(
-                              post: post,
-                              channel: snapshot.data,
-                            ));
-                      },
-                      child: AccessoryPostCardView(
-                        accessoryPost: post,
-                      ),
-                    );
-                  });
-            },
-            staggeredTileBuilder: (index) => StaggeredTile.fit(1)),
+        child: FutureBuilder<List<AccessoryPost>>(
+            future: Get.find<AccessoryPostController>().getAllPosts(),
+            builder: (context, snapshot) {
+              if (snapshot.data.isNotEmpty) {
+                return StaggeredGridView.countBuilder(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 5,
+                    staggeredTileBuilder: (index) => StaggeredTile.fit(1),
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (context, index) {
+                      AccessoryPost post = snapshot.data[index];
+                      return FutureBuilder<Channel>(
+                          future: Get.find<ChannelController>()
+                              .getChannelById(post.channelId),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return InkWell(
+                                onTap: () {
+                                  Get.to(() => PostDetailView(
+                                        post: post,
+                                        channel: snapshot.data,
+                                      ));
+                                },
+                                child: AccessoryPostCardView(
+                                  accessoryPost: post,
+                                ),
+                              );
+                            }
+                            return SpinKitCircle(
+                              size: 15,
+                              color: Get.theme.primaryColor,
+                            );
+                          });
+                    });
+              } else {
+                return Center(
+                  child: Text("No posts yet"),
+                );
+              }
+            }),
       ),
     );
   }

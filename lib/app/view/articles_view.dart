@@ -15,14 +15,19 @@ class ArticlesView extends StatelessWidget {
           IconButton(icon: Icon(Icons.search), onPressed: () {}),
         ],
       ),
-      body: ListView.builder(
-          itemCount: Get.find<ArticlePostController>().getPostsCount(),
-          itemBuilder: (ctx, index) {
-            var posts = Get.find<ArticlePostController>().getAllPosts();
-            return ArticlePostCardView(
-              post: posts[index],
-            );
-          }),
+      // body: FutureBuilder<Object>(
+      //   stream: null,
+      //   builder: (context, snapshot) {
+      //     return ListView.builder(
+      //         itemCount: Get.find<ArticlePostController>().getPostsCount(),
+      //         itemBuilder: (ctx, index) {
+      //           var posts = Get.find<ArticlePostController>().getAllPosts();
+      //           return ArticlePostCardView(
+      //             post: posts[index],
+      //           );
+      //         });
+      //   }
+      // ),
     );
   }
 }

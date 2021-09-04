@@ -19,7 +19,7 @@ class ChannelCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            image,
+            // image,
             SizedBox(
               height: 7,
             ),

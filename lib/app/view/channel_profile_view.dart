@@ -1,14 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
+import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
+import 'package:vehicleservicingapp/app/controller/service_post_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
 import 'package:vehicleservicingapp/app/data/model/article_post.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
+import 'package:vehicleservicingapp/app/data/model/post.dart';
 import 'package:vehicleservicingapp/app/data/model/service_post.dart';
 import 'package:vehicleservicingapp/app/view/create_article_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_product_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_service_post_view.dart';
-import 'package:vehicleservicingapp/app/view/create_channel_view.dart';
+import 'package:vehicleservicingapp/app/view/create_or_update_channel_view.dart';
 import 'package:vehicleservicingapp/app/view/map_view.dart';
 import 'package:vehicleservicingapp/app/view/rating_view.dart';
 import 'package:vehicleservicingapp/app/view/testimonial_view.dart';
@@ -17,31 +23,40 @@ import 'package:vehicleservicingapp/app/view/vehicles_view.dart';
 import 'package:vehicleservicingapp/app/view/widgets/accessory_post_card_view.dart';
 
 import 'package:vehicleservicingapp/app/view/widgets/article_post_card_view.dart';
+import 'package:vehicleservicingapp/app/view/widgets/profile_image_widget.dart';
 import 'package:vehicleservicingapp/app/view/widgets/service_post_card_widget.dart';
 
 class ChannelProfileView extends StatelessWidget {
   final Channel channel;
   final bool isAdmin;
-  const ChannelProfileView({Key key, this.channel, this.isAdmin})
+  const ChannelProfileView({Key key, this.channel, this.isAdmin = true})
       : super(key: key);
 
-  List<Widget> _getPosts() {
-    return Get.find<ChannelController>().getPosts(channel.id).map((e) {
-      if (channel.channelType == "Accessory") {
-        return AccessoryPostCardView(
-          accessoryPost: (e as AccessoryPost),
-          isForAdmin: true,
-        );
-      } else if (channel.channelType == "Service") {
-        return ServicePostCardWidget(
-          servicePost: e as ServicePost,
-          channel: channel,
-          isForAdmin: true,
-        );
-      } else {
-        return ArticlePostCardView(post: e as ArticlePost, isForAdmin: true);
-      }
-    }).toList();
+  Future<List<Widget>> _getPosts() async {
+    if (["Garage", "Tow-Truck", "Bolo-Service"].contains(channel.channelType)) {
+      return (await Get.find<ServicePostController>()
+              .getOwnedPosts(channel.id, channel.channelType))
+          .map((p) => ServicePostCardWidget(
+                servicePost: p,
+                channel: channel,
+                isForAdmin: true,
+              ))
+          .toList();
+    }
+
+    if (channel.channelType == "Accessory") {
+      return (await Get.find<AccessoryPostController>()
+              .getOwnedPosts(channel.id))
+          .map((p) => AccessoryPostCardView(
+                accessoryPost: p,
+                isForAdmin: true,
+              ))
+          .toList();
+    }
+
+    return (await Get.find<ArticlePostController>().getHighestRatedArticles())
+        .map((p) => ArticlePostCardView(post: p, isForAdmin: true))
+        .toList();
   }
 
   @override
@@ -73,7 +88,7 @@ class ChannelProfileView extends StatelessWidget {
               ? IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    Get.to(() => CreateChannelView(
+                    Get.to(() => CreateOrUpdateChannelView(
                           channel: channel,
                           showEditForm: true,
                         ));
@@ -93,18 +108,10 @@ class ChannelProfileView extends StatelessWidget {
             Column(children: [
               Stack(
                 children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: AssetImage(channel.imageUrl),
-                    radius: 50,
-                  ),
-                  Positioned(
-                      top: 65,
-                      left: 65,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.add_a_photo),
-                      ))
+                  ProfileImageWidget(
+                      profileUrl: channel.imageUrl,
+                      isChannelProfile: true,
+                      channelId: channel.id),
                 ],
               ),
               SizedBox(
@@ -158,7 +165,11 @@ class ChannelProfileView extends StatelessWidget {
                             Icons.comment,
                           ),
                           onPressed: () {
-                            Get.to(() => GiveTestimonialView());
+                            Get.bottomSheet(
+                              GiveTestimonialView(
+                                channelId: channel.id,
+                              ),
+                            );
                           }),
                       Text(
                         channel.testimonials.length.toString(),
@@ -171,12 +182,14 @@ class ChannelProfileView extends StatelessWidget {
                       IconButton(
                           icon: Icon(
                             Icons.star,
-                            color: channel.rating >= 3
-                                ? Colors.orangeAccent
-                                : Get.theme.iconTheme.color,
+                            // color: channel.rating. >= 3
+                            //     ? Colors.orangeAccent
+                            //     : Get.theme.iconTheme.color,
                           ),
                           onPressed: () {
-                            Get.dialog(RatingView());
+                            if (!isAdmin) {
+                              Get.dialog(RatingView());
+                            }
                           }),
                       Text(
                         channel.rating.toString(),
@@ -184,8 +197,8 @@ class ChannelProfileView extends StatelessWidget {
                       )
                     ],
                   ),
-                  channel.channelType == "Service" ||
-                          channel.channelType == "Accessory"
+                  !["Blog", "Tow-Truck", "Accessories"]
+                          .contains(channel.channelType)
                       ? Column(
                           children: [
                             IconButton(
@@ -200,7 +213,8 @@ class ChannelProfileView extends StatelessWidget {
                           ],
                         )
                       : Container(),
-                  channel.channelType == "Service"
+                  !["Blog", "Tow-Truck", "Accessories"]
+                          .contains(channel.channelType)
                       ? Column(
                           children: [
                             IconButton(
@@ -238,11 +252,29 @@ class ChannelProfileView extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            Get.find<ChannelController>().getPostsCount(channel.id) != 0
-                ? Column(
-                    children: _getPosts(),
-                  )
-                : Text("No posts yet", style: Get.theme.textTheme.bodyText2),
+            FutureBuilder<List<Widget>>(
+              builder: (ctx, snapShot) {
+                if (snapShot.connectionState == ConnectionState.done) {
+                  if (snapShot.data.isNotEmpty) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: snapShot.data,
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: Text("No posts yet"),
+                    );
+                  }
+                }
+                return Center(
+                    child: SpinKitCircle(
+                  color: Get.theme.primaryColor,
+                  size: 40,
+                ));
+              },
+              future: _getPosts(),
+            ),
             Divider(),
             Align(
               alignment: Alignment.centerLeft,

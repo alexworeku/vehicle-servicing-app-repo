@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Channel {
   String id;
   String channelName;
   String channelType;
   String description;
-  double rating;
+  List<double> rating;
   String location; //lat,long
-  int phoneNum;
+  String phoneNum;
   String city;
   String imageUrl;
   List<String> testimonials;
@@ -21,5 +23,34 @@ class Channel {
       this.rating,
       this.testimonials,
       this.userId});
-  bool get isGarage => channelType == "Garage";
+
+  Map<String, dynamic> toMap() {
+    // var latAndLong=location.split(',');
+    return <String, dynamic>{
+      'Id': id,
+      'ChannelName': channelName,
+      'ChannelType': channelType,
+      'Description': description,
+      'Rating': rating,
+      'PhoneNumber': phoneNum,
+      // 'Location':GeoPoint(double.parse(latAndLong[0]),double.parse(latAndLong[1])),
+      'City': city,
+      'ProfileImageUrl': imageUrl,
+      'Testimonials': testimonials,
+      'UserId': userId
+    };
+  }
+
+  Channel.fromMap(String id, Map<String, dynamic> data)
+      : this(
+            id: id,
+            channelName: data['ChannelName'],
+            channelType: data['ChannelType'],
+            description: data['Description'],
+            rating: List<double>.from(data['Rating']),
+            phoneNum: data['PhoneNumber'],
+            city: data['City'],
+            imageUrl: data['ProfileImageUrl'],
+            testimonials: List<String>.from(data['Testimonials']),
+            userId: data['UserId']);
 }

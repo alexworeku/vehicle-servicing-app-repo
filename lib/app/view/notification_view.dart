@@ -26,9 +26,9 @@ class NotificationView extends StatelessWidget {
                     title: Text("Alex"),
                     leading: IconButton(
                       onPressed: () {
-                        Get.to(() => UserProfileView(
-                              user: Get.find<UserController>().getUserWith(
-                                  notificationController
+                        Get.to(() async => UserProfileView(
+                              user: await Get.find<UserController>()
+                                  .getUserById(notificationController
                                       .notifications[index].userId),
                             ));
                       },
