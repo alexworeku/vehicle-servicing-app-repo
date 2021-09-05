@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -6,20 +5,16 @@ import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dar
 import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/controller/service_post_controller.dart';
-import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
-import 'package:vehicleservicingapp/app/data/model/article_post.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
-import 'package:vehicleservicingapp/app/data/model/post.dart';
-import 'package:vehicleservicingapp/app/data/model/service_post.dart';
 import 'package:vehicleservicingapp/app/view/create_article_post_view.dart';
-import 'package:vehicleservicingapp/app/view/create_product_post_view.dart';
+import 'package:vehicleservicingapp/app/view/create_accessory_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_service_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_or_update_channel_view.dart';
 import 'package:vehicleservicingapp/app/view/map_view.dart';
 import 'package:vehicleservicingapp/app/view/rating_view.dart';
 import 'package:vehicleservicingapp/app/view/testimonial_view.dart';
 import 'package:vehicleservicingapp/app/view/vehicles_view.dart';
-
+import 'package:collection/collection.dart';
 import 'package:vehicleservicingapp/app/view/widgets/accessory_post_card_view.dart';
 
 import 'package:vehicleservicingapp/app/view/widgets/article_post_card_view.dart';
@@ -29,34 +24,41 @@ import 'package:vehicleservicingapp/app/view/widgets/service_post_card_widget.da
 class ChannelProfileView extends StatelessWidget {
   final Channel channel;
   final bool isAdmin;
-  const ChannelProfileView({Key key, this.channel, this.isAdmin = true})
+  const ChannelProfileView({Key key, this.channel, @required this.isAdmin})
       : super(key: key);
 
   Future<List<Widget>> _getPosts() async {
     if (["Garage", "Tow-Truck", "Bolo-Service"].contains(channel.channelType)) {
-      return (await Get.find<ServicePostController>()
-              .getOwnedPosts(channel.id, channel.channelType))
+      var posts = await Get.find<ServicePostController>()
+          .getOwnedPosts(channel.id, channel.channelType);
+      var postwidgets = posts
           .map((p) => ServicePostCardWidget(
                 servicePost: p,
                 channel: channel,
-                isForAdmin: true,
+                isForChannelProfile: true,
+                isForAdmin: isAdmin,
               ))
           .toList();
-    }
-
-    if (channel.channelType == "Accessory") {
+      return postwidgets;
+    } else if (channel.channelType == "Accessory") {
       return (await Get.find<AccessoryPostController>()
               .getOwnedPosts(channel.id))
           .map((p) => AccessoryPostCardView(
                 accessoryPost: p,
+                channel: channel,
+                isForChannelProfile: true,
                 isForAdmin: true,
               ))
           .toList();
+    } else {
+      return (await Get.find<ArticlePostController>().getHighestRatedArticles())
+          .map((p) => ArticlePostCardView(
+              channel: channel,
+              post: p,
+              isForChannelProfile: true,
+              isForAdmin: true))
+          .toList();
     }
-
-    return (await Get.find<ArticlePostController>().getHighestRatedArticles())
-        .map((p) => ArticlePostCardView(post: p, isForAdmin: true))
-        .toList();
   }
 
   @override
@@ -66,17 +68,19 @@ class ChannelProfileView extends StatelessWidget {
           ? FloatingActionButton(
               child: Icon(Icons.add),
               onPressed: () {
-                switch (channel.channelType) {
-                  case "Accessory":
-                    Get.to(() => CreateAccessoryPostView());
-                    break;
-                  case "Service":
-                    Get.to(() => CreateServicePostView());
-
-                    break;
-                  case "Blog":
-                    Get.to(() => CreateArticlePostView());
-                    break;
+                if (["Garage", "Tow-Truck", "Bolo-Service"]
+                    .contains(channel.channelType)) {
+                  Get.to(() => CreateServicePostView(
+                        channel: channel,
+                      ));
+                } else if (channel.channelType == "Accessory") {
+                  Get.to(() => CreateAccessoryPostView(
+                        channel: channel,
+                      ));
+                } else {
+                  Get.to(() => CreateArticlePostView(
+                        channelId: channel.id,
+                      ));
                 }
               },
             )
@@ -111,6 +115,7 @@ class ChannelProfileView extends StatelessWidget {
                   ProfileImageWidget(
                       profileUrl: channel.imageUrl,
                       isChannelProfile: true,
+                      isForAdmin: isAdmin,
                       channelId: channel.id),
                 ],
               ),
@@ -165,11 +170,13 @@ class ChannelProfileView extends StatelessWidget {
                             Icons.comment,
                           ),
                           onPressed: () {
-                            Get.bottomSheet(
-                              GiveTestimonialView(
-                                channelId: channel.id,
-                              ),
-                            );
+                            if (!isAdmin) {
+                              Get.bottomSheet(
+                                GiveTestimonialView(
+                                  channelId: channel.id,
+                                ),
+                              );
+                            }
                           }),
                       Text(
                         channel.testimonials.length.toString(),
@@ -182,17 +189,21 @@ class ChannelProfileView extends StatelessWidget {
                       IconButton(
                           icon: Icon(
                             Icons.star,
-                            // color: channel.rating. >= 3
-                            //     ? Colors.orangeAccent
-                            //     : Get.theme.iconTheme.color,
+                            color: channel.rating.average >= 3
+                                ? Colors.orangeAccent
+                                : Get.theme.iconTheme.color,
                           ),
                           onPressed: () {
-                            if (!isAdmin) {
-                              Get.dialog(RatingView());
+                            if (isAdmin) {
+                              Get.dialog(RatingView(
+                                onRated: (int newRating) =>
+                                    Get.find<ChannelController>()
+                                        .addRating(channel.id, newRating),
+                              ));
                             }
                           }),
                       Text(
-                        channel.rating.toString(),
+                        channel.rating.average.toString(),
                         style: Get.theme.textTheme.subtitle2,
                       )
                     ],
@@ -213,14 +224,17 @@ class ChannelProfileView extends StatelessWidget {
                           ],
                         )
                       : Container(),
-                  !["Blog", "Tow-Truck", "Accessories"]
-                          .contains(channel.channelType)
+                  !["Blog", "Tow-Truck", "Accessory"]
+                              .contains(channel.channelType) &&
+                          isAdmin
                       ? Column(
                           children: [
                             IconButton(
                                 icon: Icon(Icons.car_repair),
                                 onPressed: () {
-                                  Get.to(() => VehiclesView());
+                                  Get.to(() => VehiclesView(
+                                        channelId: channel.id,
+                                      ));
                                 }),
                             Text(
                               "Vehicles",
@@ -257,6 +271,7 @@ class ChannelProfileView extends StatelessWidget {
                 if (snapShot.connectionState == ConnectionState.done) {
                   if (snapShot.data.isNotEmpty) {
                     return SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
                       child: Column(
                         children: snapShot.data,
                       ),
@@ -286,23 +301,25 @@ class ChannelProfileView extends StatelessWidget {
             SizedBox(
               height: 10,
             ),
-            SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: channel.testimonials
-                    .map((e) => Card(
-                          child: Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.all(12),
-                            width: Get.width,
-                            height: Get.height * 0.2,
-                            child: Text(e),
-                          ),
-                        ))
-                    .toList(),
-              ),
-            )
+            channel.testimonials.isNotEmpty
+                ? SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: channel.testimonials
+                          .map((e) => Card(
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: EdgeInsets.all(12),
+                                  width: Get.width,
+                                  height: Get.height * 0.2,
+                                  child: Text(e),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  )
+                : Center(child: Text("No testimonials given"))
           ],
         ),
       ),

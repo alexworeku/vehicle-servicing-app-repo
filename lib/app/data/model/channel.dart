@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Channel {
   String id;
   String channelName;
   String channelType;
   String description;
-  List<double> rating;
+  List<int> rating;
   String location; //lat,long
   String phoneNum;
   String city;
@@ -47,7 +45,7 @@ class Channel {
             channelName: data['ChannelName'],
             channelType: data['ChannelType'],
             description: data['Description'],
-            rating: List<double>.from(data['Rating']),
+            rating: List<int>.from(data['Rating']),
             phoneNum: data['PhoneNumber'],
             city: data['City'],
             imageUrl: data['ProfileImageUrl'],

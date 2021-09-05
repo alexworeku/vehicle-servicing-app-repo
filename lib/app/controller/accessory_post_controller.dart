@@ -7,6 +7,14 @@ class AccessoryPostController extends GetxController {
   IAccessoryRepository _accessoryRepository;
   AccessoryPostController(this._accessoryRepository);
 
+  void addAccessoryPost(AccessoryPost post) async {
+    await _accessoryRepository.add(post);
+  }
+
+  void removeAccessoryPost(String id) async {
+    await _accessoryRepository.remove(id);
+  }
+
   Future<List<AccessoryPost>> getOwnedPosts(String channelId) async {
     return await _accessoryRepository.getOwnedPosts(channelId);
   }

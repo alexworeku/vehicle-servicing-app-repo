@@ -1,18 +1,27 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
+import 'package:vehicleservicingapp/app/controller/service_post_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
 import 'package:vehicleservicingapp/app/data/model/service_post.dart';
+
+import 'package:vehicleservicingapp/app/data/provider/firebase_storage_provider.dart';
+import 'package:vehicleservicingapp/app/view/widgets/channel_info_for_post_widget.dart';
 
 class ServicePostCardWidget extends StatelessWidget {
   final ServicePost servicePost;
   final Channel channel;
-  final bool isForAdmin;
+  final bool isForAdmin, isForChannelProfile;
   final channelControlelr = Get.find<ChannelController>();
 
   ServicePostCardWidget(
-      {Key key, this.servicePost, this.channel, this.isForAdmin = false})
+      {Key key,
+      this.servicePost,
+      this.channel,
+      this.isForAdmin = false,
+      this.isForChannelProfile = false})
       : super(key: key);
 
   @override
@@ -27,68 +36,24 @@ class ServicePostCardWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image(
-                width: Get.width,
-                height: Get.width * 0.45,
-                image: AssetImage(servicePost.imageUrl),
-                fit: BoxFit.cover,
+              CachedNetworkImage(
+                imageUrl: servicePost.imageUrl,
+                placeholder: (ctx, imgProvider) =>
+                    SpinKitCircle(color: Get.theme.primaryColor),
+                errorWidget: (ctx, url, error) => Icon(Icons.error),
+                imageBuilder: (ctx, imgProvider) {
+                  return Image(
+                    width: Get.width,
+                    height: Get.width * 0.45,
+                    image: imgProvider,
+                    fit: BoxFit.cover,
+                  );
+                },
               ),
               SizedBox(height: 5),
-              isForAdmin
+              isForChannelProfile
                   ? Container()
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Row(mainAxisSize: MainAxisSize.max,
-                          //TODO:Change to network image
-                          children: [
-                            Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: AssetImage(servicePost.imageUrl),
-                                  )),
-                            ),
-                            SizedBox(width: 4),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(channel.channelName,
-                                    style: Get.theme.textTheme.subtitle1),
-                                SizedBox(
-                                  height: 3,
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                      size: 14,
-                                      color: Color.fromRGBO(238, 205, 78, 1),
-                                    ),
-                                    Text(channel.rating.toString(),
-                                        style: Get.theme.textTheme.bodyText2)
-                                  ],
-                                ),
-                              ],
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.location_on, size: 14),
-                                    SizedBox(width: 3),
-                                    Text(channel.city)
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ]),
-                    ),
+                  : ChannelInfoForPostWidget(channel: channel),
               SizedBox(
                 height: 7,
               ),
@@ -114,12 +79,34 @@ class ServicePostCardWidget extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(icon: Icon(Icons.delete), onPressed: () {})
-                ],
-              )
+              isForAdmin
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () {
+                              Get.showSnackbar(GetBar(
+                                  title: "Removing...",
+                                  message: "Please wait a moment",
+                                  icon: Icon(Icons.delete)));
+                              FirebaseStorageProvider.removeImage(
+                                  servicePost.imageUrl);
+                              Get.find<ServicePostController>()
+                                  .removeServicePost(servicePost.id);
+                              Get.close(1);
+                              Get.showSnackbar(
+                                GetBar(
+                                  title: "Post Removed",
+                                  message: "Post Removed Successfully.",
+                                  icon: Icon(Icons.delete),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            })
+                      ],
+                    )
+                  : Container()
             ],
           ),
         ),

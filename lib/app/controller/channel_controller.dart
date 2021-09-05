@@ -8,7 +8,11 @@ class ChannelController extends GetxController {
   IChannelRepository _channelRepository;
   ChannelController(this._channelRepository);
   List<String> getChannelTypes() {
-    return ["Garage", "Accessory", "Tow-Truck", "Bolo-Service", "Blog", "Blog"];
+    return ["Garage", "Accessory", "Tow-Truck", "Bolo-Service", "Blog"];
+  }
+
+  void addRating(String channelId, dynamic ratingValue) async {
+    await _channelRepository.addRating(channelId, ratingValue);
   }
 
   Future<void> addNewChannel(Channel channel) async {
@@ -24,7 +28,11 @@ class ChannelController extends GetxController {
         .getAllByUserId(Get.find<UserController>().getCurrentUserId());
   }
 
-  Future<Channel> getChannelById(String channelId) {
+  Future<List<Channel>> getTopRated(String type, int limit) {
+    return _channelRepository.getTopRated(type, limit);
+  }
+
+  Future<Channel> getChannelById(String channelId) async {
     return _channelRepository.get(channelId);
   }
 
@@ -32,8 +40,9 @@ class ChannelController extends GetxController {
     await _channelRepository.remove(channelId);
   }
 
-  void updateChannelProfile(String channelId, String newValue) async {
-    await _channelRepository.updateOnly(channelId, "ProfileImageUrl", newValue);
+  void updateChannelProfile(
+      String channelId, String field, dynamic newValue) async {
+    await _channelRepository.updateOnly(channelId, field, newValue);
   }
 
   void addTestimonial(String channelId, String comment) async {

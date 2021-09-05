@@ -6,6 +6,14 @@ class ServicePostController extends GetxController {
   IServiceRepository _servicePostRepository;
   ServicePostController(this._servicePostRepository);
 
+  void addServicePost(ServicePost post) async {
+    await _servicePostRepository.add(post);
+  }
+
+  void removeServicePost(String postId) async {
+    await _servicePostRepository.remove(postId);
+  }
+
   Future<List<ServicePost>> getPostsByType(String type) async {
     return await _servicePostRepository.getPostsByType(type);
   }

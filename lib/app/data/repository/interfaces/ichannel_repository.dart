@@ -10,4 +10,5 @@ abstract class IChannelRepository {
   Future<List<Channel>> getTopRated(String type, int limit);
   Future<List<Channel>> getNearBy(String type);
   Future<void> addTestimonial(String channelId, String message);
+  Future<void> addRating(String channelId, dynamic value);
 }

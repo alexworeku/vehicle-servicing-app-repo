@@ -13,16 +13,11 @@ class AccessoryRepository implements IAccessoryRepository {
 
   @override
   Future<List<AccessoryPost>> getAll() async {
-    var accessoriesRef = await FirebaseFirestore.instance
-        .collection("Accessories")
-        .withConverter<AccessoryPost>(
-            fromFirestore: (snapShot, _) =>
-                AccessoryPost.fromMap(snapShot.id, snapShot.data()),
-            toFirestore: (post, _) => post.toMap())
-        .get();
+    var accessoriesRef =
+        await FirebaseFirestore.instance.collection("Accessories").get();
     List<AccessoryPost> posts = [];
-    accessoriesRef.docs.forEach((element) {
-      posts.add(element.data());
+    accessoriesRef.docs.forEach((doc) {
+      posts.add(AccessoryPost.fromMap(doc.id, doc.data()));
     });
     return posts;
   }
@@ -31,15 +26,11 @@ class AccessoryRepository implements IAccessoryRepository {
   Future<List<AccessoryPost>> getAccessoryPostsByTag(String tag) async {
     var accessoriesRef = await FirebaseFirestore.instance
         .collection("Accessories")
-        .withConverter<AccessoryPost>(
-            fromFirestore: (snapShot, _) =>
-                AccessoryPost.fromMap(snapShot.id, snapShot.data()),
-            toFirestore: (post, _) => post.toMap())
         .where('Tag', arrayContains: tag)
         .get();
     List<AccessoryPost> posts = [];
-    accessoriesRef.docs.forEach((element) {
-      posts.add(element.data());
+    accessoriesRef.docs.forEach((doc) {
+      posts.add(AccessoryPost.fromMap(doc.id, doc.data()));
     });
     return posts;
   }
@@ -68,6 +59,7 @@ class AccessoryRepository implements IAccessoryRepository {
   Future<List<AccessoryPost>> getTop(int limit) async {
     var accessoriesRef = await FirebaseFirestore.instance
         .collection("Accessories")
+        .orderBy("RegisteredDate", descending: true)
         .limit(limit)
         .get();
     List<AccessoryPost> posts = [];

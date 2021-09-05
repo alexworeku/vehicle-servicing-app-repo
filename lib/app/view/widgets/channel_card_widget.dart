@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class ChannelCardWidget extends StatelessWidget {
   final String channelName, city;
   final double rating;
-  final Image image;
+  final Widget image;
   const ChannelCardWidget(
       {Key key, this.channelName, this.rating, this.image, this.city})
       : super(key: key);
@@ -19,7 +19,7 @@ class ChannelCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // image,
+            image,
             SizedBox(
               height: 7,
             ),
@@ -32,7 +32,7 @@ class ChannelCardWidget extends StatelessWidget {
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 5),
-              width: Get.width * 0.6,
+              width: Get.width * 0.9,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

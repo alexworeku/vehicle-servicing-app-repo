@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
@@ -142,6 +143,14 @@ class _CreateOrUpdateChannelViewState extends State<CreateOrUpdateChannelView> {
                         if (_formKey.currentState.validate()) {
                           if (widget.showEditForm) {
                             //Update
+                            Get.showSnackbar(GetBar(
+                              title: "Updating...",
+                              message: "Please wait a moment",
+                              icon: SpinKitCircle(
+                                color: Get.theme.primaryColor,
+                                size: 15,
+                              ),
+                            ));
                             await channelController.updateChannel(
                               widget.channel.id,
                               new Channel(
@@ -156,6 +165,7 @@ class _CreateOrUpdateChannelViewState extends State<CreateOrUpdateChannelView> {
                                   userId: Get.find<UserController>()
                                       .getCurrentUserId()),
                             );
+                            Get.close(1);
                             Get.showSnackbar(GetBar(
                               duration: Duration(seconds: 3),
                               title: "Channel Updated",
@@ -164,18 +174,27 @@ class _CreateOrUpdateChannelViewState extends State<CreateOrUpdateChannelView> {
                             ));
                           } else {
                             //Add new
+                            Get.showSnackbar(GetBar(
+                              title: "Adding...",
+                              message: "Please wait a moment",
+                              icon: SpinKitCircle(
+                                color: Get.theme.primaryColor,
+                                size: 15,
+                              ),
+                            ));
                             await channelController.addNewChannel(
                               new Channel(
                                   channelName: nameController.text,
                                   channelType: selectedChannelType,
                                   description: descController.text,
                                   city: selectedCity,
-                                  rating: [0],
+                                  rating: [],
                                   phoneNum: phoneController.text,
                                   testimonials: <String>[],
                                   userId: Get.find<UserController>()
                                       .getCurrentUserId()),
                             );
+                            Get.close(1);
                             Get.showSnackbar(GetBar(
                               duration: Duration(seconds: 3),
                               title: "Channel Created",

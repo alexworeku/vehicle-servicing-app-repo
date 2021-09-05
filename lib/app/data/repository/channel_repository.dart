@@ -86,4 +86,14 @@ class ChannelRepository implements IChannelRepository {
         await FirebaseFirestore.instance.collection("Channels").doc(id).get();
     return Channel.fromMap(docSnapshot.id, docSnapshot.data());
   }
+
+  @override
+  Future<void> addRating(String channelId, value) async {
+    await FirebaseFirestore.instance
+        .collection("Channels")
+        .doc(channelId)
+        .update({
+      'Rating': FieldValue.arrayUnion([value])
+    });
+  }
 }

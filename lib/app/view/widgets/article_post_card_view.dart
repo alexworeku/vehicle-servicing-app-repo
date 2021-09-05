@@ -1,15 +1,27 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/article_post.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
+import 'package:vehicleservicingapp/app/data/provider/firebase_storage_provider.dart';
 import 'package:vehicleservicingapp/app/view/post_detail_view.dart';
+import 'package:vehicleservicingapp/app/view/widgets/channel_info_for_post_widget.dart';
 
 class ArticlePostCardView extends StatelessWidget {
   final ArticlePost post;
   final bool isForAdmin;
-  const ArticlePostCardView({Key key, this.post, this.isForAdmin = false})
+  final Channel channel;
+  final bool isForChannelProfile;
+  const ArticlePostCardView(
+      {Key key,
+      this.post,
+      this.isForAdmin = false,
+      this.channel,
+      this.isForChannelProfile = false})
       : super(key: key);
 
   @override
@@ -21,31 +33,11 @@ class ArticlePostCardView extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.all(5.0),
               child: Column(children: [
+                isForChannelProfile
+                    ? Container()
+                    : ChannelInfoForPostWidget(channel: channel),
                 InkWell(
                   onTap: () {
-                    //TODO:Open Channel Profile
-                  },
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: AssetImage(post.imageUrl),
-                              )),
-                        ),
-                        SizedBox(width: 6),
-                        Text(snapshot.data.channelName,
-                            style: Get.theme.textTheme.subtitle1)
-                      ]),
-                ),
-                InkWell(
-                  onTap: () {
-                    //TODO:OPen Post Detail
                     Get.to(() => PostDetailView(
                           post: post,
                           channel: snapshot.data,
@@ -53,49 +45,65 @@ class ArticlePostCardView extends StatelessWidget {
                   },
                   child: Padding(
                     padding: EdgeInsets.only(left: 10, right: 10),
-                    child: Container(
-                      child: Card(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 5, top: 3),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      post.title,
-                                      style: Get.theme.textTheme.subtitle2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                    child: Card(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 5, top: 3),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    post.title,
+                                    style: Get.theme.textTheme.subtitle2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  Text(post.duration.toString() + "mins.")
-                                ],
-                              ),
-                              SizedBox(
-                                height: 7,
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
+                                ),
+                                Text(post.duration.toString() + "mins.")
+                              ],
+                            ),
+                            SizedBox(
+                              height: 7,
+                            ),
+                            Container(
+                              height: Get.height * 0.4,
+                              width: Get.width,
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CachedNetworkImage(
+                                      imageUrl: post.imageUrl,
+                                      placeholder: (ctx, imgProvider) =>
+                                          SpinKitCircle(
+                                              color: Get.theme.primaryColor),
+                                      errorWidget: (ctx, url, error) =>
+                                          Icon(Icons.error),
+                                      imageBuilder: (ctx, imgProvider) {
+                                        return Image(
+                                          width: Get.width,
+                                          height: Get.width * 0.45,
+                                          image: imgProvider,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 6,
+                                    ),
+                                    Text(
                                       post.content,
                                       style: Get.theme.textTheme.bodyText2,
                                     ),
-                                  ),
-                                  Image(
-                                      height: Get.width * 0.3,
-                                      width: Get.width * 0.3,
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(post.imageUrl))
-                                ],
-                              )
-                            ],
-                          ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -103,33 +111,59 @@ class ArticlePostCardView extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
-                  child:  isForAdmin
-                          ? Align(
-                              alignment: Alignment.centerRight,
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(Icons.delete),
-                              ),
-                            )
-                          :Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+                  child: isForAdmin
+                      ? Align(
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            onPressed: () {
+                              Get.showSnackbar(GetBar(
+                                  title: "Removing...",
+                                  message: "Please wait a moment",
+                                  icon: Icon(Icons.delete)));
+                              FirebaseStorageProvider.removeImage(
+                                  post.imageUrl);
+                              Get.find<ArticlePostController>()
+                                  .removeArticlePost(post.id);
+                              Get.close(1);
+                              Get.showSnackbar(
+                                GetBar(
+                                  title: "Post Removed",
+                                  message: "Post Removed Successfully.",
+                                  icon: Icon(Icons.delete),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.delete),
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
                               children: [
                                 IconButton(
                                     icon: Icon(
                                       Icons.thumb_up,
                                     ),
-                                    onPressed: () {}),
+                                    onPressed: () {
+                                      Get.find<ArticlePostController>()
+                                          .updateAccessoryPost(
+                                              post.id, "Likes", post.likes + 1);
+                                    }),
                                 Text(
                                   post.likes.toString(),
                                   style: Get.theme.textTheme.subtitle2,
                                 )
                               ],
                             ),
-                      IconButton(icon: Icon(Icons.bookmark), onPressed: () {}),
-                    ],
-                  ),
+                            IconButton(
+                                icon: Icon(Icons.bookmark),
+                                onPressed: () {
+                                  //TODO:Save offline
+                                }),
+                          ],
+                        ),
                 )
               ]),
             );

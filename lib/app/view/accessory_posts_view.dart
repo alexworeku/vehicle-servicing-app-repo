@@ -26,44 +26,52 @@ class AccessoryPostsView extends StatelessWidget {
         child: FutureBuilder<List<AccessoryPost>>(
             future: Get.find<AccessoryPostController>().getAllPosts(),
             builder: (context, snapshot) {
-              if (snapshot.data.isNotEmpty) {
-                return StaggeredGridView.countBuilder(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    staggeredTileBuilder: (index) => StaggeredTile.fit(1),
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      AccessoryPost post = snapshot.data[index];
-                      return FutureBuilder<Channel>(
-                          future: Get.find<ChannelController>()
-                              .getChannelById(post.channelId),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.done) {
-                              return InkWell(
-                                onTap: () {
-                                  Get.to(() => PostDetailView(
-                                        post: post,
-                                        channel: snapshot.data,
-                                      ));
-                                },
-                                child: AccessoryPostCardView(
-                                  accessoryPost: post,
-                                ),
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.data.isNotEmpty) {
+                  return StaggeredGridView.countBuilder(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5,
+                      staggeredTileBuilder: (index) => StaggeredTile.fit(1),
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        AccessoryPost post = snapshot.data[index];
+                        return FutureBuilder<Channel>(
+                            future: Get.find<ChannelController>()
+                                .getChannelById(post.channelId),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                return InkWell(
+                                  onTap: () {
+                                    Get.to(() => PostDetailView(
+                                          post: post,
+                                          channel: snapshot.data,
+                                        ));
+                                  },
+                                  child: AccessoryPostCardView(
+                                    accessoryPost: post,
+                                    channel: snapshot.data,
+                                  ),
+                                );
+                              }
+                              return SpinKitCircle(
+                                size: 15,
+                                color: Get.theme.primaryColor,
                               );
-                            }
-                            return SpinKitCircle(
-                              size: 15,
-                              color: Get.theme.primaryColor,
-                            );
-                          });
-                    });
-              } else {
-                return Center(
-                  child: Text("No posts yet"),
-                );
+                            });
+                      });
+                } else {
+                  return Center(
+                    child: Text("No posts yet"),
+                  );
+                }
               }
+              return Center(
+                child: SpinKitCircle(
+                  color: Get.theme.primaryColor,
+                ),
+              );
             }),
       ),
     );

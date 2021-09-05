@@ -15,8 +15,13 @@ class ProfileImageWidget extends StatefulWidget {
   String profileUrl;
   bool isChannelProfile;
   String channelId;
+  bool isForAdmin;
   ProfileImageWidget(
-      {Key key, this.profileUrl, this.isChannelProfile = false, this.channelId})
+      {Key key,
+      this.profileUrl,
+      this.isChannelProfile = false,
+      this.isForAdmin = false,
+      this.channelId})
       : super(key: key);
 
   @override
@@ -24,6 +29,32 @@ class ProfileImageWidget extends StatefulWidget {
 }
 
 class _ProfileImageWidgetState extends State<ProfileImageWidget> {
+  Future<void> _pickAndUploadImage() async {
+    var pickedImage = await ImagePicker()
+        .pickImage(imageQuality: 50, source: ImageSource.gallery);
+    if (pickedImage != null) {
+      File selectedImage = new File(pickedImage.path);
+      String downloadUrl;
+      if (widget.profileUrl == null) {
+        downloadUrl = await FirebaseStorageProvider.uploadImage(selectedImage);
+      } else {
+        downloadUrl = await FirebaseStorageProvider.uploadAndReplaceImage(
+            selectedImage, widget.profileUrl);
+      }
+      if (widget.isChannelProfile) {
+        Get.find<ChannelController>().updateChannelProfile(
+            widget.channelId, "ProfileImageUrl", downloadUrl);
+      } else {
+        Get.find<UserController>()
+            .updateUserOnly("ProfileImageUrl", downloadUrl);
+      }
+
+      setState(() {
+        widget.profileUrl = downloadUrl;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -45,37 +76,14 @@ class _ProfileImageWidgetState extends State<ProfileImageWidget> {
         Positioned(
             top: 65,
             left: 65,
-            child: IconButton(
-              onPressed: () async {
-                debugPrint("In Picker");
-                var pickedImage = await ImagePicker()
-                    .pickImage(imageQuality: 50, source: ImageSource.gallery);
-                if (pickedImage != null) {
-                  File selectedImage = new File(pickedImage.path);
-                  String downloadUrl;
-                  if (widget.profileUrl == null) {
-                    downloadUrl = await FirebaseStorageProvider.uploadImage(
-                        selectedImage);
-                  } else {
-                    downloadUrl =
-                        await FirebaseStorageProvider.uploadAndReplaceImage(
-                            selectedImage, widget.profileUrl);
-                  }
-                  if (widget.isChannelProfile) {
-                    Get.find<ChannelController>()
-                        .updateChannelProfile(widget.channelId, downloadUrl);
-                  } else {
-                    Get.find<UserController>()
-                        .updateUserOnly("ProfileImageUrl", downloadUrl);
-                  }
-
-                  setState(() {
-                    widget.profileUrl = downloadUrl;
-                  });
-                }
-              },
-              icon: Icon(Icons.add_a_photo),
-            ))
+            child: widget.isForAdmin
+                ? IconButton(
+                    onPressed: () async {
+                      await _pickAndUploadImage();
+                    },
+                    icon: Icon(Icons.add_a_photo),
+                  )
+                : Container())
       ],
     );
   }

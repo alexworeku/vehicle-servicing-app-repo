@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RatingView extends StatefulWidget {
-  RatingView({Key key}) : super(key: key);
+  final Function onRated;
+  RatingView({Key key, @required this.onRated}) : super(key: key);
 
   @override
   _RatingViewState createState() => _RatingViewState();
@@ -45,6 +46,7 @@ class _RatingViewState extends State<RatingView> {
                 TextButton(
                     onPressed: () {
                       Get.back();
+                      widget.onRated(rating);
                     },
                     child: Text("Rate"))
               ],

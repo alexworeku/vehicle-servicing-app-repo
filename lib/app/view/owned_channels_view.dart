@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
+import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
 import 'package:vehicleservicingapp/app/view/channel_profile_view.dart';
 import 'package:vehicleservicingapp/app/view/create_or_update_channel_view.dart';
@@ -60,15 +61,33 @@ class _OwnedChannelsViewState extends State<OwnedChannelsView> {
                                 icon: Icons.delete,
                                 color: Colors.redAccent,
                                 onTap: () {
+                                  Get.showSnackbar(GetBar(
+                                    title: "Removing...",
+                                    message: "Please wait a moment",
+                                    icon: SpinKitCircle(
+                                      color: Get.theme.primaryColor,
+                                      size: 10,
+                                    ),
+                                  ));
                                   channelController
                                       .removeChannel(snapshot.data[index].id);
                                   setState(() {});
+                                  Get.close(1);
+                                  Get.showSnackbar(GetBar(
+                                    duration: Duration(seconds: 3),
+                                    title: "Channel Removed",
+                                    message: "Channel have been removed",
+                                    icon: Icon(Icons.chat),
+                                  ));
                                 },
                               ),
                             ],
                             child: ListTile(
                                 onTap: () {
                                   Get.to(() => ChannelProfileView(
+                                        isAdmin: Get.find<UserController>()
+                                                .getCurrentUserId() ==
+                                            snapshot.data[index].userId,
                                         channel: snapshot.data[index],
                                       ));
                                 },
@@ -87,7 +106,8 @@ class _OwnedChannelsViewState extends State<OwnedChannelsView> {
                                         },
                                       )
                                     : CircleAvatar(
-                                        radius: 20, child: Icon(Icons.chat)),
+                                        radius: 20,
+                                        child: Icon(Icons.car_repair)),
                                 title: Text(snapshot.data[index].channelName),
                                 subtitle:
                                     Text(snapshot.data[index].channelType),

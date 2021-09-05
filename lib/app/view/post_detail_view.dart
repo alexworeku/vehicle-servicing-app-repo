@@ -1,12 +1,18 @@
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
 import 'package:vehicleservicingapp/app/data/model/article_post.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
 import 'package:vehicleservicingapp/app/data/model/post.dart';
 import 'package:vehicleservicingapp/app/data/model/service_post.dart';
+import 'package:collection/collection.dart';
+
+import 'channel_profile_view.dart';
 
 class PostDetailView extends StatelessWidget {
   final Post post;
@@ -23,11 +29,20 @@ class PostDetailView extends StatelessWidget {
       body: ListView(
         children: [
           Stack(children: [
-            Image(
-                fit: BoxFit.cover,
-                height: Get.height * 0.4,
-                width: Get.width,
-                image: AssetImage(post.imageUrl)),
+            CachedNetworkImage(
+              imageUrl: post.imageUrl,
+              placeholder: (ctx, imgProvider) =>
+                  SpinKitCircle(color: Get.theme.primaryColor),
+              errorWidget: (ctx, url, error) => Icon(Icons.error),
+              imageBuilder: (ctx, imgProvider) {
+                return Image(
+                  width: Get.width,
+                  height: Get.height * 0.43,
+                  image: imgProvider,
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
             Positioned(
                 right: 15,
                 top: 5,
@@ -59,19 +74,36 @@ class PostDetailView extends StatelessWidget {
               children: [
                 isSavedArticlePost
                     ? Container()
-                    : Row(crossAxisAlignment: CrossAxisAlignment.center,
-                        //TODO:Change to network image
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                            Container(
-                              height: 55,
-                              width: 55,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: AssetImage(channel.imageUrl),
-                                  )),
-                            ),
+                            InkWell(
+                                onTap: () {
+                                  Get.to(() => ChannelProfileView(
+                                        isAdmin: Get.find<UserController>()
+                                                .getCurrentUserId() ==
+                                            channel.userId,
+                                        channel: channel,
+                                      ));
+                                },
+                                child: channel.imageUrl != null
+                                    ? CachedNetworkImage(
+                                        imageUrl: channel.imageUrl,
+                                        placeholder: (ctx, imgProvider) =>
+                                            SpinKitCircle(
+                                                color: Get.theme.primaryColor),
+                                        errorWidget: (ctx, url, error) =>
+                                            Icon(Icons.error),
+                                        imageBuilder: (ctx, imgProvider) {
+                                          return CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage: imgProvider);
+                                        },
+                                      )
+                                    : CircleAvatar(
+                                        radius: 25,
+                                        child: Icon(Icons.car_repair),
+                                      )),
                             SizedBox(width: 4),
                             Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +122,7 @@ class PostDetailView extends StatelessWidget {
                                         size: 14,
                                         color: Color.fromRGBO(238, 205, 78, 1),
                                       ),
-                                      Text(channel.rating.toString(),
+                                      Text(channel.rating.average.toString(),
                                           style: Get.theme.textTheme.bodyText2)
                                     ],
                                   ),
@@ -138,7 +170,7 @@ class PostDetailView extends StatelessWidget {
                                       (post as AccessoryPost).price.toString()
                                   : (post as ArticlePost).duration.toString() +
                                       "mins."),
-                          style: Get.theme.textTheme.bodyText1)
+                          style: Get.theme.textTheme.subtitle1)
                     ]),
                 SizedBox(
                   height: 8,
@@ -152,7 +184,7 @@ class PostDetailView extends StatelessWidget {
                   style: Get.theme.textTheme.bodyText2,
                 ),
                 SizedBox(height: 8),
-                Text("Tags:", style: Get.theme.textTheme.bodyText1),
+                Text("Tags:", style: Get.theme.textTheme.subtitle1),
                 SizedBox(
                   height: 5,
                 ),
@@ -169,7 +201,7 @@ class PostDetailView extends StatelessWidget {
                                     color: Get.theme.accentIconTheme.color),
                                 margin: EdgeInsets.only(right: 10),
                                 child: Text(
-                                  e,
+                                  e.trim(),
                                   style: Get.theme.textTheme.caption,
                                 ),
                               ),

@@ -25,14 +25,14 @@ class AccessoryPost extends Post {
   AccessoryPost.fromMap(String docId, Map<String, Object> data)
       : this(
             id: docId,
-            tags: data['Tags'],
+            tags: List<String>.from(data['Tags']),
             productName: data['ProductName'],
             price: data['Price'],
             brand: data['Brand'],
             productDescription: data['ProductDescription'],
             imageUrl: data['ImageUrl'],
             date: data['RegisteredDate'],
-            channelId: data['ChannelID']);
+            channelId: data['ChannelId']);
 
   Map<String, Object> toMap() {
     return <String, Object>{
@@ -43,7 +43,7 @@ class AccessoryPost extends Post {
       "ProductDescription": productDescription,
       "ImageUrl": imageUrl,
       "Tags": tags,
-      "Date": date,
+      "RegisteredDate": date,
       "ChannelId": channelId
     };
   }

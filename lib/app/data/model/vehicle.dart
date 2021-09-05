@@ -1,5 +1,3 @@
-import 'package:vehicleservicingapp/app/data/model/vehicle_owner.dart';
-
 class Vehicle {
   String id;
   String type;
@@ -10,7 +8,9 @@ class Vehicle {
   String checkOutDate;
   String imageUrl;
   String channelId;
-  VehicleOwner owner;
+  String ownerName;
+  String ownerPhoneNumber;
+
   Vehicle({
     this.id,
     this.type,
@@ -20,12 +20,13 @@ class Vehicle {
     this.imageUrl,
     this.checkInDate,
     this.checkOutDate,
-    this.owner,
+    this.ownerName,
+    this.ownerPhoneNumber,
     this.channelId,
   });
-  Vehicle.fromMap(Map<String, dynamic> data)
+  Vehicle.fromMap(String id, Map<String, dynamic> data)
       : this(
-            id: data['Id'],
+            id: id,
             type: data['Type'],
             model: data['Model'],
             plateNo: data['PlateNo'],
@@ -33,7 +34,8 @@ class Vehicle {
             imageUrl: data['ImageUrl'],
             checkInDate: data['CheckInDate'],
             checkOutDate: data['CheckOutDate'],
-            owner: VehicleOwner.fromMap(data['Owner']),
+            ownerName: data['OwnerName'],
+            ownerPhoneNumber: data['OwnerPhoneNumber'],
             channelId: data['ChannelId']);
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -44,9 +46,10 @@ class Vehicle {
       'Description': description,
       'ImageUrl': imageUrl,
       'CheckInDate': checkInDate,
-      "CheckOutDate": checkOutDate,
+      'CheckOutDate': checkOutDate,
+      'OwnerName': ownerName,
+      'OwnerPhoneNumber': ownerPhoneNumber,
       'ChannelId': channelId,
-      'Owner': owner.toMap()
     };
   }
 }

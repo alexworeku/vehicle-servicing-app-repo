@@ -35,23 +35,26 @@ class ServicesView extends StatelessWidget {
                       var posts = snapshot.data;
 
                       return FutureBuilder<Channel>(
+                          future: Get.find<ChannelController>()
+                              .getChannelById(posts[index].channelId),
                           builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return InkWell(
-                              onTap: () {
-                                Get.to(() => PostDetailView(
-                                    post: posts[index],
-                                    channel: snapshot.data));
-                              },
-                              child: ServicePostCardWidget(
-                                  servicePost: posts[index],
-                                  channel: snapshot.data));
-                        } else {
-                          return SpinKitCircle(
-                            color: Get.theme.primaryColor,
-                          );
-                        }
-                      });
+                            if (snapshot.connectionState ==
+                                ConnectionState.done) {
+                              return InkWell(
+                                  onTap: () {
+                                    Get.to(() => PostDetailView(
+                                        post: posts[index],
+                                        channel: snapshot.data));
+                                  },
+                                  child: ServicePostCardWidget(
+                                      servicePost: posts[index],
+                                      channel: snapshot.data));
+                            }
+
+                            return SpinKitCircle(
+                              color: Get.theme.primaryColor,
+                            );
+                          });
                     });
               } else {
                 return Center(

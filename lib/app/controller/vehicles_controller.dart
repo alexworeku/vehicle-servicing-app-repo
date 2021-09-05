@@ -1,46 +1,20 @@
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/data/model/vehicle.dart';
-import 'package:vehicleservicingapp/app/data/model/vehicle_owner.dart';
+import 'package:vehicleservicingapp/app/data/repository/interfaces/ivehicle_repository.dart';
 
 class VehiclesController extends GetxController {
-  var vehicles = [
-    Vehicle(
-      plateNo: "A69675 A.A",
-      type: "Mini bus",
-      model: "M2120",
-      description: "The problem is with the engine it has to be cleaned",
-      checkInDate: DateTime.now().toString(),
-      checkOutDate: DateTime.now().toString(),
-      owner: new VehicleOwner(name: "Alex Woreku", phoneNumber: "0913662761"),
-      imageUrl: "assets/images/garage1.jpg",
-    ),
-    Vehicle(
-      plateNo: "A69675 A.A",
-      type: "Mini bus",
-      model: "M2120",
-      description: "The problem is with the engine it has to be cleaned",
-      checkInDate: DateTime.now().toString(),
-      checkOutDate: DateTime.now().toString(),
-      owner: new VehicleOwner(name: "Alex Woreku", phoneNumber: "0913662761"),
-      imageUrl: "assets/images/garage1.jpg",
-    ),
-    Vehicle(
-      plateNo: "A69675 A.A",
-      type: "Mini bus",
-      model: "M2120",
-      description: "The problem is with the engine it has to be cleaned",
-      checkInDate: DateTime.now().toString(),
-      checkOutDate: DateTime.now().toString(),
-      owner: new VehicleOwner(name: "Alex Woreku", phoneNumber: "0913662761"),
-      imageUrl: "assets/images/garage1.jpg",
-    ),
-  ];
+  IVehicleRepository _vehicleRepository;
+  VehiclesController(this._vehicleRepository);
 
-  List<Vehicle> getVehicles() {
-    return vehicles;
+  void addVehicle(Vehicle vehicle) async {
+    await _vehicleRepository.add(vehicle);
   }
 
-  int getVehiclesCount() {
-    return vehicles.length;
+  void removeVehicle(String vehicleId) async {
+    await _vehicleRepository.remove(vehicleId);
+  }
+
+  Future<List<Vehicle>> getVehicles(String channelId) async {
+    return await _vehicleRepository.getAll(channelId);
   }
 }
