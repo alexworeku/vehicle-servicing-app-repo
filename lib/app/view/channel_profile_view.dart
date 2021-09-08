@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:vehicleservicingapp/app/controller/accessory_post_controller.dart';
 import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
@@ -8,6 +11,7 @@ import 'package:vehicleservicingapp/app/controller/channel_controller.dart';
 import 'package:vehicleservicingapp/app/controller/service_post_controller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/channel.dart';
+import 'package:vehicleservicingapp/app/data/provider/location_provider.dart';
 import 'package:vehicleservicingapp/app/data/repository/add_notification_view.dart';
 import 'package:vehicleservicingapp/app/view/create_article_post_view.dart';
 import 'package:vehicleservicingapp/app/view/create_accessory_post_view.dart';
@@ -272,8 +276,58 @@ class _ChannelProfileViewState extends State<ChannelProfileView> {
                                       children: [
                                         IconButton(
                                             icon: Icon(Icons.add_location),
-                                            onPressed: () {
-                                              Get.to(() => MapView());
+                                            onPressed: () async {
+                                              if (widget.isAdmin) {
+                                                Get.showSnackbar(GetBar(
+                                                  icon: SpinKitCircle(
+                                                      color: Get
+                                                          .theme.primaryColor),
+                                                  title: "Loading...",
+                                                  message:
+                                                      "Loading your current location",
+                                                ));
+                                                var currentLocation =
+                                                    await LocationProvider
+                                                        .getCurrentLocation();
+
+                                                Get.find<ChannelController>()
+                                                    .updateChannelProfile(
+                                                        snapshot.data.id,
+                                                        "Location",
+                                                        GeoPoint(
+                                                            currentLocation
+                                                                .latitude,
+                                                            currentLocation
+                                                                .longitude));
+                                                Get.close(1);
+                                                Get.showSnackbar(GetBar(
+                                                  title: "Saved...",
+                                                  duration:
+                                                      Duration(seconds: 3),
+                                                  message:
+                                                      "Your current location is saved as a location for your business",
+                                                ));
+                                              } else {
+                                                if (snapshot.data.location !=
+                                                    null) {
+                                                  var geoPoint = snapshot
+                                                      .data.location
+                                                      .split(',');
+                                                  await MapsLauncher
+                                                      .launchCoordinates(
+                                                    double.parse(geoPoint[0]),
+                                                    double.parse(geoPoint[1]),
+                                                  );
+                                                } else {
+                                                  Get.showSnackbar(GetBar(
+                                                    title: "Location",
+                                                    duration:
+                                                        Duration(seconds: 3),
+                                                    message:
+                                                        "Location not available",
+                                                  ));
+                                                }
+                                              }
                                             }),
                                         Text(
                                           widget.isAdmin

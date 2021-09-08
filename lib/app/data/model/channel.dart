@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+
 class Channel {
   String id;
   String channelName;
@@ -19,6 +22,7 @@ class Channel {
       this.city,
       this.phoneNum,
       this.rating,
+      this.location,
       this.testimonials,
       this.userId});
 
@@ -31,7 +35,7 @@ class Channel {
       'Description': description,
       'Rating': rating,
       'PhoneNumber': phoneNum,
-      // 'Location':GeoPoint(double.parse(latAndLong[0]),double.parse(latAndLong[1])),
+      'Location': location,
       'City': city,
       'ProfileImageUrl': imageUrl,
       'Testimonials': testimonials,
@@ -39,16 +43,23 @@ class Channel {
     };
   }
 
-  Channel.fromMap(String id, Map<String, dynamic> data)
-      : this(
-            id: id,
-            channelName: data['ChannelName'],
-            channelType: data['ChannelType'],
-            description: data['Description'],
-            rating: List<int>.from(data['Rating']),
-            phoneNum: data['PhoneNumber'],
-            city: data['City'],
-            imageUrl: data['ProfileImageUrl'],
-            testimonials: List<String>.from(data['Testimonials']),
-            userId: data['UserId']);
+  Channel.fromMap(String id, Map<String, dynamic> data) {
+    this.id = id;
+    channelName = data['ChannelName'];
+    channelType = data['ChannelType'];
+    description = data['Description'];
+    rating = List<int>.from(data['Rating']);
+    phoneNum = data['PhoneNumber'];
+    city = data['City'];
+    location =
+        data['Location'] != null ? _locationToString(data['Location']) : "";
+    imageUrl = data['ProfileImageUrl'];
+    testimonials = List<String>.from(data['Testimonials']);
+    userId = data['UserId'];
+  }
+
+  String _locationToString(dynamic geoPoint) {
+    var points = (geoPoint as GeoPoint);
+    return "${points.latitude},${points.longitude}";
+  }
 }

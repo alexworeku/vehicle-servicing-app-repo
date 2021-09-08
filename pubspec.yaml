@@ -45,7 +45,9 @@ dependencies:
   pull_to_refresh: ^2.0.0
   path: ^1.8.0
   path_provider: ^2.0.3
-  flutter_local_notifications: ^5.0.0
+  maps_launcher: ^2.0.1
+  location: ^4.3.0
+  geoflutterfire: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
