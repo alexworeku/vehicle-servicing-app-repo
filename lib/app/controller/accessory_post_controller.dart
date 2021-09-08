@@ -23,6 +23,10 @@ class AccessoryPostController extends GetxController {
     return await _accessoryRepository.getAll();
   }
 
+  Future<List<AccessoryPost>> getPostsByTag(String tag) async {
+    return _accessoryRepository.getAllByTag(tag);
+  }
+
   Future<List<AccessoryPost>> getTopPosts() async {
     return await _accessoryRepository.getTop(10);
   }

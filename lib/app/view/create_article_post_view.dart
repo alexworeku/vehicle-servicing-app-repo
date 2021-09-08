@@ -144,6 +144,7 @@ class _CreateArticlePostViewState extends State<CreateArticlePostView> {
                                     likes: 0,
                                     channelId: widget.channelId,
                                     imageUrl: downloadUrl,
+                                    date: DateTime.now().toString(),
                                     tags: tagController.text.isNotEmpty
                                         ? tagController.text.trim().split("#")
                                         : <String>[titleController.text]));

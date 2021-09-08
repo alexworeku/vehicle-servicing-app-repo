@@ -23,10 +23,10 @@ class AccessoryRepository implements IAccessoryRepository {
   }
 
   @override
-  Future<List<AccessoryPost>> getAccessoryPostsByTag(String tag) async {
+  Future<List<AccessoryPost>> getAllByTag(String tag) async {
     var accessoriesRef = await FirebaseFirestore.instance
         .collection("Accessories")
-        .where('Tag', arrayContains: tag)
+        .where('Tags', arrayContains: tag)
         .get();
     List<AccessoryPost> posts = [];
     accessoriesRef.docs.forEach((doc) {

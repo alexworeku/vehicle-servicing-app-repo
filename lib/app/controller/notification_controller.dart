@@ -1,41 +1,20 @@
 import 'package:get/get.dart';
-import 'package:vehicleservicingapp/app/data/model/notification.dart';
+import 'package:vehicleservicingapp/app/data/model/app_notification.dart';
+import 'package:vehicleservicingapp/app/data/repository/interfaces/inotification_repository.dart';
 
 class NotificationController extends GetxController {
-  var _notifications = <Notification>[
-    new Notification(
-        day: "2 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-    new Notification(
-        day: "2 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-    new Notification(
-        day: "2 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-    new Notification(
-        day: "2 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-    new Notification(
-        day: "2 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-    new Notification(
-        day: "3 day ago",
-        notificationMessage:
-            "You have recieved a new service request.please call back to the user",
-        userId: "alex"),
-  ];
+  INotificationRepository _notificationRepository;
 
-  NotificationController();
-  List<Notification> get notifications => _notifications;
-  int get notificationsCount => _notifications.length;
+  NotificationController(this._notificationRepository);
+  void add(AppNotification notification) async {
+    await _notificationRepository.add(notification);
+  }
+
+  void removeNotification(String id) async {
+    await _notificationRepository.remove(id);
+  }
+
+  Future<List<AppNotification>> getAllNotification(String userId) async {
+    return await _notificationRepository.getAll(userId);
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/app_user.dart';
@@ -63,14 +64,24 @@ class LoginView extends StatelessWidget {
                 child: ElevatedButton(
                     onPressed: () async {
                       var controller = Get.find<UserController>();
-
+                      Get.showSnackbar(GetBar(
+                          icon: SpinKitCircle(
+                            color: Get.theme.primaryColor,
+                            size: 20,
+                          ),
+                          title: "Wait a moment",
+                          message: "We are checking account"));
                       if (await controller
                           .isUserRegistered(phonecontroller.text.trim())) {
+                        Get.close(1);
                         await controller.verifyUserByPhone(
                             new AppUser(phoneNo: phonecontroller.text.trim()));
                       } else {
-                        Get.snackbar(
-                            "Account does not exist!", "Please Sign up first");
+                        Get.close(1);
+                        Get.showSnackbar(GetBar(
+                            duration: Duration(seconds: 2),
+                            title: "Account does not exist!",
+                            message: "Please Sign up first"));
                       }
                     },
                     child: Text("Login")),

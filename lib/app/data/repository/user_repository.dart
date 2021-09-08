@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:vehicleservicingapp/app/data/model/app_user.dart';
 import 'package:vehicleservicingapp/app/data/repository/interfaces/iuser_repository.dart';
 
@@ -49,5 +50,15 @@ class UserRepository implements IUserRepository {
         .collection("Users")
         .doc(id)
         .update({field: newValue});
+  }
+
+  @override
+  Future<AppUser> getUserByPhoneNumber(String phone) async {
+    var result = await FirebaseFirestore.instance
+        .collection("Users")
+        .where("PhoneNumber", isEqualTo: phone)
+        .limit(1)
+        .get();
+    return AppUser.fromMap(result.docs.first.data());
   }
 }

@@ -44,7 +44,10 @@ class ChannelInfoForPostWidget extends StatelessWidget {
                   size: 14,
                   color: Color.fromRGBO(238, 205, 78, 1),
                 ),
-                Text(channel.rating.average.toString(),
+                Text(
+                    channel.rating.isEmpty
+                        ? 0.0.toString()
+                        : channel.rating.average.toString(),
                     style: Get.theme.textTheme.bodyText2)
               ],
             ),

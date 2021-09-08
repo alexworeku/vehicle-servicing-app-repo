@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
+import 'package:vehicleservicingapp/app/controller/article_post_cotroller.dart';
 import 'package:vehicleservicingapp/app/controller/user_controller.dart';
 import 'package:vehicleservicingapp/app/data/model/accessory_post.dart';
 import 'package:vehicleservicingapp/app/data/model/article_post.dart';
@@ -14,7 +13,7 @@ import 'package:collection/collection.dart';
 
 import 'channel_profile_view.dart';
 
-class PostDetailView extends StatelessWidget {
+class PostDetailView extends StatefulWidget {
   final Post post;
   final Channel channel;
   final bool isSavedArticlePost;
@@ -24,13 +23,18 @@ class PostDetailView extends StatelessWidget {
       : super(key: key);
 
   @override
+  _PostDetailViewState createState() => _PostDetailViewState();
+}
+
+class _PostDetailViewState extends State<PostDetailView> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
           Stack(children: [
             CachedNetworkImage(
-              imageUrl: post.imageUrl,
+              imageUrl: widget.post.imageUrl,
               placeholder: (ctx, imgProvider) =>
                   SpinKitCircle(color: Get.theme.primaryColor),
               errorWidget: (ctx, url, error) => Icon(Icons.error),
@@ -72,7 +76,7 @@ class PostDetailView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                isSavedArticlePost
+                widget.isSavedArticlePost
                     ? Container()
                     : Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,13 +86,13 @@ class PostDetailView extends StatelessWidget {
                                   Get.to(() => ChannelProfileView(
                                         isAdmin: Get.find<UserController>()
                                                 .getCurrentUserId() ==
-                                            channel.userId,
-                                        channel: channel,
+                                            widget.channel.userId,
+                                        channel: widget.channel,
                                       ));
                                 },
-                                child: channel.imageUrl != null
+                                child: widget.channel.imageUrl != null
                                     ? CachedNetworkImage(
-                                        imageUrl: channel.imageUrl,
+                                        imageUrl: widget.channel.imageUrl,
                                         placeholder: (ctx, imgProvider) =>
                                             SpinKitCircle(
                                                 color: Get.theme.primaryColor),
@@ -108,7 +112,7 @@ class PostDetailView extends StatelessWidget {
                             Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(channel.channelName,
+                                  Text(widget.channel.channelName,
                                       style: Get.theme.textTheme.subtitle1
                                           .copyWith(
                                               fontWeight: FontWeight.bold)),
@@ -122,7 +126,11 @@ class PostDetailView extends StatelessWidget {
                                         size: 14,
                                         color: Color.fromRGBO(238, 205, 78, 1),
                                       ),
-                                      Text(channel.rating.average.toString(),
+                                      Text(
+                                          widget.channel.rating.isEmpty
+                                              ? 0.0.toString()
+                                              : widget.channel.rating.average
+                                                  .toString(),
                                           style: Get.theme.textTheme.bodyText2)
                                     ],
                                   ),
@@ -130,16 +138,54 @@ class PostDetailView extends StatelessWidget {
                             Expanded(
                               child: Align(
                                 alignment: Alignment.centerRight,
-                                child: (post is ArticlePost)
+                                child: (widget.post is ArticlePost)
                                     ? Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          IconButton(
-                                              icon: Icon(Icons.thumb_up),
-                                              onPressed: () {}),
+                                          Row(
+                                            children: [
+                                              Text((widget.post as ArticlePost)
+                                                  .likes
+                                                  .toString()),
+                                              IconButton(
+                                                  icon: Icon(Icons.thumb_up),
+                                                  onPressed: () {
+                                                    Get.find<
+                                                            ArticlePostController>()
+                                                        .updateAccessoryPost(
+                                                            widget.post.id,
+                                                            "Likes",
+                                                            (widget.post
+                                                                        as ArticlePost)
+                                                                    .likes +
+                                                                1);
+                                                    setState(() {});
+                                                  }),
+                                            ],
+                                          ),
                                           IconButton(
                                               icon: Icon(Icons.bookmark),
-                                              onPressed: () {})
+                                              onPressed: () async {
+                                                var isSaved = await Get.find<
+                                                        ArticlePostController>()
+                                                    .savePostOffline(
+                                                        widget.post);
+                                                if (isSaved) {
+                                                  Get.showSnackbar(GetBar(
+                                                    title: "Offline save",
+                                                    message: "Article saved",
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ));
+                                                } else {
+                                                  Get.showSnackbar(GetBar(
+                                                    title: "Failed",
+                                                    message: "Not saved",
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  ));
+                                                }
+                                              })
                                         ],
                                       )
                                     : IconButton(
@@ -155,20 +201,25 @@ class PostDetailView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                          post is ServicePost
-                              ? (post as ServicePost).serviceName
-                              : (post is AccessoryPost
-                                  ? (post as AccessoryPost).productName
-                                  : (post as ArticlePost).title),
+                          widget.post is ServicePost
+                              ? (widget.post as ServicePost).serviceName
+                              : (widget.post is AccessoryPost
+                                  ? (widget.post as AccessoryPost).productName
+                                  : (widget.post as ArticlePost).title),
                           style: Get.theme.textTheme.subtitle1
                               .copyWith(fontWeight: FontWeight.bold)),
                       Text(
-                          post is ServicePost
-                              ? "ETB: " + (post as ServicePost).price.toString()
-                              : (post is AccessoryPost
+                          widget.post is ServicePost
+                              ? "ETB: " +
+                                  (widget.post as ServicePost).price.toString()
+                              : (widget.post is AccessoryPost
                                   ? "ETB: " +
-                                      (post as AccessoryPost).price.toString()
-                                  : (post as ArticlePost).duration.toString() +
+                                      (widget.post as AccessoryPost)
+                                          .price
+                                          .toString()
+                                  : (widget.post as ArticlePost)
+                                          .duration
+                                          .toString() +
                                       "mins."),
                           style: Get.theme.textTheme.subtitle1)
                     ]),
@@ -176,11 +227,11 @@ class PostDetailView extends StatelessWidget {
                   height: 8,
                 ),
                 Text(
-                  post is ServicePost
-                      ? (post as ServicePost).serviceDescription
-                      : (post is AccessoryPost
-                          ? (post as AccessoryPost).productDescription
-                          : (post as ArticlePost).content),
+                  widget.post is ServicePost
+                      ? (widget.post as ServicePost).serviceDescription
+                      : (widget.post is AccessoryPost
+                          ? (widget.post as AccessoryPost).productDescription
+                          : (widget.post as ArticlePost).content),
                   style: Get.theme.textTheme.bodyText2,
                 ),
                 SizedBox(height: 8),
@@ -191,7 +242,7 @@ class PostDetailView extends StatelessWidget {
                 SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                        children: post.tags
+                        children: widget.post.tags
                             .map(
                               (e) => Container(
                                 padding: EdgeInsets.all(5),

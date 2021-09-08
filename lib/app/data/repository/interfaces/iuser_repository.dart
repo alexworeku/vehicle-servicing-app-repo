@@ -6,5 +6,6 @@ abstract class IUserRepository {
   Future<void> updateOnly(String id, String field, dynamic newValue);
   Future<AppUser> get(String id);
   Future<bool> existsById(String id);
+  Future<AppUser> getUserByPhoneNumber(String phone);
   Future<bool> existsByPhone(String phoneNumber);
 }

@@ -18,6 +18,10 @@ class ServicePostController extends GetxController {
     return await _servicePostRepository.getPostsByType(type);
   }
 
+  Future<List<ServicePost>> getPostsByTag(String tag) async {
+    return _servicePostRepository.getPostsByTag(tag);
+  }
+
   Future<List<ServicePost>> getOwnedPosts(String channelId, String type) async {
     return await _servicePostRepository.getOwnedPosts(type, channelId);
   }

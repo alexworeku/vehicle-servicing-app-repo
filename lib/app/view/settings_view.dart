@@ -12,7 +12,7 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  bool _isDarkMode = false, _servicingAlarm = false, _hidePhone = false;
+  bool _isDarkMode = false;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -38,22 +38,6 @@ class _SettingsViewState extends State<SettingsView> {
                     trailing: Icon(Icons.keyboard_arrow_right),
                     onTap: () {
                       Get.to(() => EditUserProfileView());
-                    },
-                  ),
-                  Divider(),
-                  ListTile(
-                    title: Text("Servicing Date"),
-                    trailing: Icon(Icons.calendar_today),
-                    onTap: () {},
-                  ),
-                  Divider(),
-                  SwitchListTile(
-                    title: Text("Servicing alarm"),
-                    value: _servicingAlarm,
-                    onChanged: (value) {
-                      setState(() {
-                        _servicingAlarm = value;
-                      });
                     },
                   ),
                   Divider(),

@@ -49,6 +49,7 @@ class _EditUserProfileViewState extends State<EditUserProfileView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     ProfileImageWidget(
+                      isForAdmin: true,
                       profileUrl: snapshot.data.profileImageUrl,
                     ),
                     SizedBox(

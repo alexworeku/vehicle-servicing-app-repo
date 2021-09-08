@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -112,6 +113,7 @@ class _AddVehicleViewState extends State<AddVehicleView> {
                     return null;
                   },
                   controller: phoneController,
+                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: "Enter vehicle owner's phone number",

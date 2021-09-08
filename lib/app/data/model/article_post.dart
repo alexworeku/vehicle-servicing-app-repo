@@ -22,7 +22,7 @@ class ArticlePost extends Post {
             date: date,
             channelId: channelId);
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMap({bool isForOffline = false}) {
     return <String, dynamic>{
       'Id': id,
       'Title': title,
@@ -30,22 +30,33 @@ class ArticlePost extends Post {
       'Content': content,
       'Likes': likes,
       'ImageUrl': imageUrl,
-      'Tags': tags,
+      'Tags': isForOffline ? _mergeTags(tags) : tags,
       'RegisteredDate': date,
       'ChannelId': channelId
     };
   }
 
-  ArticlePost.fromMap(String id, Map<String, dynamic> data)
-      : this(
-          id: id,
-          title: data['Title'],
-          content: data['Content'],
-          duration: data['Duration'],
-          likes: data['Likes'],
-          imageUrl: data['ImageUrl'],
-          tags: List<String>.from(data['Tags']),
-          date: data['RegisteredDate'],
-          channelId: data['ChannelId'],
-        );
+  ArticlePost.fromMap(String id, Map<String, dynamic> data,
+      {isForOffline = false}) {
+    this.id = id;
+    this.title = data['Title'];
+    this.content = data['Content'];
+    this.duration = data['Duration'];
+    this.likes = data['Likes'];
+    this.imageUrl = data['ImageUrl'];
+    this.tags = isForOffline
+        ? _splitTags(data['Tags'])
+        : List<String>.from(data['Tags']);
+    this.date = data['RegisteredDate'];
+    this.channelId = data['ChannelId'];
+  }
+  String _mergeTags(List<String> tags) {
+    String mergedTags = "#";
+    mergedTags += tags.join("#");
+    return mergedTags;
+  }
+
+  List<String> _splitTags(String tags) {
+    return tags.split("#");
+  }
 }

@@ -7,6 +7,12 @@ abstract class IArticleRepository {
   Future<void> updateOnly(String id, String field, dynamic newValue);
 
   Future<List<ArticlePost>> getAll();
+  Future<List<ArticlePost>> getOwnedPosts(String channelId);
+
+  Future<List<ArticlePost>> getAllByTag(String tag);
   Future<List<ArticlePost>> getHighestRated(int limit);
+  Future<bool> saveOffline(ArticlePost post);
+
+  Future<bool> removeSaved(String id);
   Future<List<ArticlePost>> getSavedArticles();
 }

@@ -5,6 +5,6 @@ abstract class IAccessoryRepository {
   Future<void> remove(String id);
   Future<List<AccessoryPost>> getAll();
   Future<List<AccessoryPost>> getTop(int limit);
-  Future<List<AccessoryPost>> getAccessoryPostsByTag(String tag);
+  Future<List<AccessoryPost>> getAllByTag(String tag);
   Future<List<AccessoryPost>> getOwnedPosts(String channelId);
 }

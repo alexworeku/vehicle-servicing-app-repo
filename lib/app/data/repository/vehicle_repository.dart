@@ -30,4 +30,17 @@ class VehicleRepository implements IVehicleRepository {
         .doc(vehicleId)
         .delete();
   }
+
+  @override
+  Future<List<Vehicle>> getAllByPlateNo(String plateNum) async {
+    var snapShot = await FirebaseFirestore.instance
+        .collection("Vehicles")
+        .where('PlateNo', isEqualTo: plateNum)
+        .get();
+    List<Vehicle> posts = [];
+    snapShot.docs.forEach((doc) {
+      posts.add(Vehicle.fromMap(doc.id, doc.data()));
+    });
+    return posts;
+  }
 }

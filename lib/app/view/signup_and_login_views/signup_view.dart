@@ -68,6 +68,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: 12,
                 ),
                 TextFormField(
+                    keyboardType: TextInputType.phone,
                     controller: _phoneController,
                     decoration: InputDecoration(
                         border: OutlineInputBorder(),

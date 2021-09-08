@@ -17,4 +17,8 @@ class VehiclesController extends GetxController {
   Future<List<Vehicle>> getVehicles(String channelId) async {
     return await _vehicleRepository.getAll(channelId);
   }
+
+  Future<List<Vehicle>> getVehiclesByPlateNum(String plateNo) async {
+    return _vehicleRepository.getAllByPlateNo(plateNo);
+  }
 }

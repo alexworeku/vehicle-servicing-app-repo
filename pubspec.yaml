@@ -43,6 +43,9 @@ dependencies:
   cached_network_image: ^3.1.0
   collection: ^1.15.0
   pull_to_refresh: ^2.0.0
+  path: ^1.8.0
+  path_provider: ^2.0.3
+  flutter_local_notifications: ^5.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -58,28 +61,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/images/bk_image.jpg
-    - assets/images/accessory icon.png
-    - assets/images/article icon.png
-    - assets/images/bolo service icon.png
-    - assets/images/garage icon.png
-    - assets/images/tow truck icon.png
-    - assets/images/garage_bk.jpeg
-    - assets/images/bk 2.jpg
-    - assets/images/bk_image.jpg
-    - assets/images/product1.jpg
-    - assets/images/product2.jpg
-    - assets/images/garage1.jpg
-    - assets/images/garage2.jpg
-    - assets/images/garage3.jpg
-    - assets/images/towtruck1.jpg
-    - assets/images/towtruck2.jpg
-    - assets/images/article1.jpg
-    - assets/images/article2.jpg
-    - assets/images/bolo1.jpg
-    - assets/images/bolo2.jpg
-    # An image asset can refer to one or more resolution-specific "variants", see
+  #assets:
+
+  # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
   # For details regarding adding assets from package dependencies, see
